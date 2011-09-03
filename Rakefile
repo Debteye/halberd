@@ -6,7 +6,7 @@ begin
     gemspec.description = %{
       Connect to Yodlee.  Yay!
     }.strip.split.join(' ')
-    gemspec.homepage    = 'debteye.com'
+    gemspec.homepage    = 'http://www.debteye.com'
 
     gemspec.authors     = ['Paul Zhang']
     gemspec.email       = 'paul.zhang@debteye.com'

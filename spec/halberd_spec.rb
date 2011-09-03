@@ -12,8 +12,11 @@ describe Halberd::Config do
   end
 
   it "should give us some real credentials" do
-    @fake.stub(:config).and_return({'cobrand_id' => 'foo', 'application_id' => "bar", 'cobrand_login' => "baz", 'cobrand_password' => 'woah', 'tnc_version' => 'rargh'})
-    @fake.config.each_pair do |k,v|
+    @fake.stub(:config).and_return({'credentials' => {'cobrand_id' => 'foo', 'application_id' => "bar", 
+                                                      'cobrand_login' => "baz", 'cobrand_password' => 'woah', 
+                                                      'tnc_version' => 'rargh'}
+                                  })
+    @fake.config['credentials'].each_pair do |k,v|
       @fake.credentials.send(k).should == v
     end
   end

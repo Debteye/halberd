@@ -19,13 +19,15 @@ Gem::Specification.new do |s|
     "Gemfile",
     "Gemfile.lock",
     "README.md",
+    "Rakefile",
     "VERSION",
     "config/halberd.yml",
+    "halberd.gemspec",
     "lib/halberd.rb",
     "spec/halberd_spec.rb",
     "spec/spec_helper.rb"
   ]
-  s.homepage = %q{debteye.com}
+  s.homepage = %q{http://www.debteye.com}
   s.require_paths = [%q{lib}]
   s.rubygems_version = %q{1.8.6}
   s.summary = %q{Yodlee Ruby Connect.}
@@ -34,24 +36,21 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<savon_model>, [">= 0"])
-      s.add_runtime_dependency(%q<orderedhash>, [">= 0"])
-      s.add_runtime_dependency(%q<rspec>, [">= 0"])
+      s.add_runtime_dependency(%q<halberd>, [">= 0"])
+      s.add_development_dependency(%q<rspec>, ["~> 2.6.0"])
       s.add_development_dependency(%q<rspec>, ["~> 2.6.0"])
       s.add_runtime_dependency(%q<orderedhash>, ["~> 0.0.6"])
       s.add_runtime_dependency(%q<savon>, ["~> 0.9.6"])
     else
-      s.add_dependency(%q<savon_model>, [">= 0"])
-      s.add_dependency(%q<orderedhash>, [">= 0"])
-      s.add_dependency(%q<rspec>, [">= 0"])
+      s.add_dependency(%q<halberd>, [">= 0"])
+      s.add_dependency(%q<rspec>, ["~> 2.6.0"])
       s.add_dependency(%q<rspec>, ["~> 2.6.0"])
       s.add_dependency(%q<orderedhash>, ["~> 0.0.6"])
       s.add_dependency(%q<savon>, ["~> 0.9.6"])
     end
   else
-    s.add_dependency(%q<savon_model>, [">= 0"])
-    s.add_dependency(%q<orderedhash>, [">= 0"])
-    s.add_dependency(%q<rspec>, [">= 0"])
+    s.add_dependency(%q<halberd>, [">= 0"])
+    s.add_dependency(%q<rspec>, ["~> 2.6.0"])
     s.add_dependency(%q<rspec>, ["~> 2.6.0"])
     s.add_dependency(%q<orderedhash>, ["~> 0.0.6"])
     s.add_dependency(%q<savon>, ["~> 0.9.6"])

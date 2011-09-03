@@ -34,12 +34,12 @@ module Halberd
       @locale[:language] = 'en' 
 
       @credentials ||= Credentials.new do |cr| 
-        cr.cobrand_id       = config['cobrand_id'] 
-        cr.application_id   = config['application_id']
-        cr.cobrand_login    = config['cobrand_login']
-        cr.cobrand_password = config['cobrand_password']
+        cr.cobrand_id       = config['credentials']['cobrand_id'] 
+        cr.application_id   = config['credentials']['application_id']
+        cr.cobrand_login    = config['credentials']['cobrand_login']
+        cr.cobrand_password = config['credentials']['cobrand_password']
         cr.locale           = @locale 
-        cr.tnc_version      = config['tnc_version'] 
+        cr.tnc_version      = config['credentials']['tnc_version'] 
       end
     end
   end
