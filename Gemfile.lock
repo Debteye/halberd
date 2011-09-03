@@ -1,3 +1,13 @@
+PATH
+  remote: .
+  specs:
+    halberd (0.0.0)
+      orderedhash
+      orderedhash (~> 0.0.6)
+      rspec
+      savon (~> 0.9.6)
+      savon_model
+
 GEM
   remote: http://rubygems.org/
   specs:
@@ -39,6 +49,5 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  orderedhash
-  rspec
-  savon_model
+  halberd!
+  rspec (~> 2.6.0)
