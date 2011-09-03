@@ -13,7 +13,7 @@ begin
 
     gemspec.add_development_dependency  'rspec', '~> 2.6.0'
     gemspec.add_runtime_dependency      'orderedhash',   '~> 0.0.6'
-    gemspec.add_runtime_dependency      'savon',    '~> 0.9.6'
+    gemspec.add_runtime_dependency      'savon_model',    '~> 1.0.0'
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
