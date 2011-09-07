@@ -2,11 +2,9 @@ PATH
   remote: .
   specs:
     halberd (0.0.0)
-      orderedhash
+      halberd
       orderedhash (~> 0.0.6)
-      rspec
-      savon (~> 0.9.6)
-      savon_model
+      savon_model (~> 1.0.0)
 
 GEM
   remote: http://rubygems.org/

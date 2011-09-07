@@ -24,10 +24,6 @@ module Halberd
       @config ||= YAML.load_file(config_location)
     end 
 
-    def yodlee_location
-      config['yodlee_url']
-    end 
-
     def credentials
       @locale ||= OrderedHash.new 
       @locale[:country] = 'US' 
@@ -42,23 +38,61 @@ module Halberd
         cr.tnc_version      = config['credentials']['tnc_version'] 
       end
     end
-  end
 
-  class Us
-    include Config
-    attr_accessor :session, :response, :session_token, :channel_id, :client, :timeout_time
+    def yodlee_location
+      config['yodlee_url']
+    end 
 
-    def initialize
-             
-      @client = Savon::Client.new do
+    def cobrand_client
+      @cobrand_client ||= Savon::Client.new do
         wsdl.namespace = "http://cobrandlogin.login.core.soap.yodlee.com"
         wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/CobrandLoginService"
       end
     end
+  
+    def registration_client
+      @registration_client ||= Savon::Client.new do
+        wsdl.namespace = "http://userregistration.usermanagement.core.soap.yodlee.com"
+        wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/UserRegistrationService?wsdl"
+      end
+    end
+
+    def login_client
+      @login_client ||= Savon::Client.new do
+        wsdl.namespace = "http://login.login.core.soap.yodlee.com"
+        wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/LoginService?wsdl"
+      end
+    end
+ 
+    def item_client
+      @item_client ||= Savon::Client.new do
+        wsdl.namespace = "http://itemmanagement.accountmanagement.core.soap.yodlee.com"
+        wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/ItemManagementService"
+      end
+    end
+   
+    def dataservice_client
+      @dataservice_client ||= Savon::Client.new do
+        wsdl.namespace = "http://dataservice.dataservice.core.soap.yodlee.com"
+        wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/DataService?wsdl"
+      end
+    end
+
+    def content_traversal_client
+      @content_traversal_client ||= Savon::Client.new do
+        wsdl.namespace = "http://contentservicetraversal.traversal.ext.soap.yodlee.com"
+        wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/ContentServiceTraversalService"
+      end
+    end
+  end
+
+  class Us
+    include Config
+
+    attr_accessor :session, :response, :session_token, :channel_id, :timeout_time
 
     def connect!
-      
-      @response = client.request :cob, :login_cobrand do
+      @response = cobrand_client.request :cob, :login_cobrand do
         soap.element_form_default = :unqualified
         soap.namespaces['xmlns:login'] = "http://login.ext.soap.yodlee.com"
         soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
@@ -99,26 +133,93 @@ module Halberd
     def spawn
       You.new(self)
     end
+   
+    def get_interface
+      Interface.new(self)
+    end
+
+    class Interface
+      include Config
+
+      attr_accessor :us
+   
+      def initialize(us)
+        @us = us
+      end
+
+      def get_service_list(container_name)
+        @service_list ||= client.request :sl, :get_content_services_by_container_type2 do
+          soap.element_form_default = :unqualified
+          soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
+          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
+          soap.body = {
+            :cctx => {
+              :cobrand_id      => credentials.cobrand_id,
+              :channel_id      => us.channel_id,
+              :locale          => credentials.locale,
+              :tnc_version     => credentials.tnc_version,
+              :application_id  => credentials.application_id,
+              :cobrand_conversation_credentials => {
+                :session_token => us.session_token,
+              },
+              :order! => [:cobrand_id, :channel_id, :locale, :tnc_version, :application_id, :cobrand_conversation_credentials],
+              :attributes! => {
+                :locale => { "xsi:type" => "tns1:Locale" },
+                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
+              }
+            },
+            :container_type => container_name,
+            :order! => [:cctx, :container_type],
+            :attributes! => {
+              :cobrand_context => { "xsi:type" => "tns1:CobrandContext" }
+            }
+          }
+        end
+      end    
+
+      def get_login_form(content_service_id)
+        login_form_response = item_client.request :sl, :get_login_form_for_content_service do
+          soap.element_form_default = :unqualified
+          soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
+          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
+          soap.body = {
+            :cobrand_context => {
+              :cobrand_id      => credentials.cobrand_id,
+              :channel_id      => us.channel_id,
+              :locale          => credentials.locale,
+              :tnc_version     => credentials.tnc_version,
+              :application_id  => credentials.application_id,
+              :cobrand_conversation_credentials => {
+                :session_token => us.session_token,
+              },
+              :order! => [:cobrand_id, :channel_id, :locale, :tnc_version, :application_id, :cobrand_conversation_credentials],
+              :attributes! => {
+                :locale => { "xsi:type" => "tns1:Locale" },
+                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
+              }
+            },
+            :content_service_id => content_service_id,
+            :order! => [:cobrand_context, :content_service_id],
+            :attributes! => {
+              :cobrand_context => { "xsi:type" => "tns1:CobrandContext" }
+            }
+          }
+        end
+      end
+    end
   end
 
   class You
     include Config
-    attr_accessor :us, :username, :password, :item_ids, :registration_client, :login_client,
-                  :registration_response, :login_response, :session_token, :timeout_time
+
+    attr_accessor :us, :username, :password, :item_ids, :registration_response, 
+                  :login_response, :session_token, :timeout_time
+
     def initialize(us, opts = {})
       @us = us
       @username = opts[:username]
       @password = opts[:password]
       @item_ids = opts[:item_ids]
-      @registration_client = Savon::Client.new do
-        wsdl.namespace = "http://userregistration.usermanagement.core.soap.yodlee.com"
-        wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/UserRegistrationService?wsdl"
-      end
-
-      @login_client = Savon::Client.new do
-        wsdl.namespace = "http://login.login.core.soap.yodlee.com"
-        wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/LoginService?wsdl"
-      end
     end
 
     def register!
@@ -182,12 +283,12 @@ module Halberd
         soap.body = {
           :cobrand_context => {
             :cobrand_id      => credentials.cobrand_id,
-            :channel_id      => cobrand_context_response.to_hash[:login_cobrand_response][:login_cobrand_return][:cobrand_conversation_credentials][:channel_id],
+            :channel_id      => us.channel_id,
             :locale          => credentials.locale,
             :tnc_version     => credentials.tnc_version,
             :application_id  => credentials.application_id,
             :cobrand_conversation_credentials => {
-              :session_token => cobrand_context_response.to_hash[:login_cobrand_response][:login_cobrand_return][:cobrand_conversation_credentials][:session_token],
+              :session_token => us.session_token,
             },
             :order! => [:cobrand_id, :channel_id, :locale, :tnc_version, :application_id, :cobrand_conversation_credentials],
             :attributes! => {
@@ -228,23 +329,12 @@ module Halberd
     class Items
       include Config
 
-      attr_accessor :us, :you, :items, :register_response, :register_client, 
-                    :summary_client, :summary_response
+      attr_accessor :us, :you, :items, :register_response, :summary_response
+
       def initialize(us, you, opts = {})
         @us = us
         @you = you
         @items = opts[:items] || []
-
-        @register_client = Savon::Client.new do
-          wsdl.namespace = "http://itemmanagement.accountmanagement.core.soap.yodlee.com"
-          wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/ItemManagementService"
-        end
-   
-        @summary_client = client = Savon::Client.new do
-          wsdl.namespace = "http://dataservice.dataservice.core.soap.yodlee.com"
-          wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/DataService?wsdl"
-        end
-
       end 
 
       def prefs
@@ -258,7 +348,7 @@ module Halberd
       end
 
       def get_summary!
-        @summary_response = summary_client.request :lines, :get_item_summaries3 do
+        @summary_response = dataservice_client.request :lines, :get_item_summaries3 do
           soap.element_form_default = :unqualified
           soap.namespaces['xmlns:collections'] = "http://collections.soap.yodlee.com"
           soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
@@ -301,7 +391,9 @@ module Halberd
       end
 
       def register!(content_service_id, opts = {})
-        @register_response = register_client.request :sl, :add_item_for_content_service1 do
+        credentials = opts[:credentials]
+
+        @register_response = item_client.request :sl, :add_item_for_content_service1 do
           soap.element_form_default = :unqualified
           soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
           soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
@@ -333,7 +425,7 @@ module Halberd
             },
             :content_service_id => content_service_id,
             :credential_fields => {
-              :elements => [e1, e2],
+              :elements => credentials,
               :attributes! => {
                 :elements => { "xsi:type" => "common:FieldInfoSingle" },
               }
