@@ -148,7 +148,7 @@ module Halberd
       end
 
       def get_service_list(container_name)
-        @service_list ||= client.request :sl, :get_content_services_by_container_type2 do
+        @service_list ||= content_traversal_client.request :sl, :get_content_services_by_container_type2 do
           soap.element_form_default = :unqualified
           soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
           soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
