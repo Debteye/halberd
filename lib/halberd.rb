@@ -3,6 +3,7 @@ require 'orderedhash'
 
 Savon.configure do |config|
   config.soap_version = 2
+  config.log_level = :info
 end
 
 module Halberd 
