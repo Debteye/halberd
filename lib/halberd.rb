@@ -2,7 +2,6 @@ require 'savon_model'
 require 'orderedhash'
 
 Savon.configure do |config|
-  config.log_level = :debug # changing the log level
   config.soap_version = 2
 end
 
