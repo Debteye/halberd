@@ -351,7 +351,7 @@ module Halberd
       def initialize(us, you, opts = {})
         @us = us
         @you = you
-        @items = opts[:items] || []
+        @items = opts[:items] || you.item_ids || []
       end 
 
       def prefs
