@@ -412,7 +412,7 @@ module Halberd
 
         user_credentials && user_credentials.map! do |credential|
           CREDENTIAL_ORDER.inject({}) do |hsh, key|
-            hsh[CREDENTIAL_CONVERT[key] || key] = user_credential[key]
+            hsh[CREDENTIAL_CONVERT[key] || key] = credential[key]
             hsh
           end
         end
