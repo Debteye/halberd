@@ -408,11 +408,11 @@ module Halberd
       end
 
       def register!(content_service_id, opts = {})
-        credentials = opts[:credentials]
+        user_credentials = opts[:credentials]
 
-        credentials && credentials.map! do |credential|
+        user_credentials && user_credentials.map! do |credential|
           CREDENTIAL_ORDER.inject({}) do |hsh, key|
-            hsh[CREDENTIAL_CONVERT[key] || key] = credential[key]
+            hsh[CREDENTIAL_CONVERT[key] || key] = user_credential[key]
             hsh
           end
         end
@@ -449,7 +449,7 @@ module Halberd
             },
             :content_service_id => content_service_id,
             :credential_fields => {
-              :elements => credentials,
+              :elements => user_credentials,
               :attributes! => {
                 :elements => { "xsi:type" => "common:FieldInfoSingle" },
               }
