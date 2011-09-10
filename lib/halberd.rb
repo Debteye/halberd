@@ -332,8 +332,8 @@ module Halberd
 
       attr_accessor :us, :you, :items, :register_response, :summary_response
 
-      CREDENTIAL_CONVERT = {:is_optional_mfa => "IsOptionalMFA", 
-                            :is_mfa => "IsMFA"}
+      CREDENTIAL_CONVERT = {:is_optional_mfa => "isOptionalMFA", 
+                            :is_mfa => "isMFA"}
       CREDENTIAL_ORDER = [:name,
                           :display_name,
                           :is_editable,
