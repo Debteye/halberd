@@ -23,6 +23,7 @@ module Halberd
       config_location = Rails.root.join(config_location) if defined?(Rails) 
       
       @config ||= YAML.load_file(config_location)
+      defined?(Rails) ? @config[Rails.env] : @config
     end 
 
     def credentials
