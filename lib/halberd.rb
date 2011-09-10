@@ -252,7 +252,7 @@ module Halberd
           },
           :user_profile => { :values => { :table => {
             :key => 'EMAIL_ADDRESS',
-            :value => "support+#{username}@gmail.com",
+            :value => "support+#{username}@debteye.com",
             :attributes! => {
               :key => { "xsi:type" => "xsd:string" },
               :value => { "xsi:type" => "xsd:string" }
@@ -324,13 +324,29 @@ module Halberd
     end
 
     def items_interface
-      Items.new(us, self)
+      @items_interface ||= Items.new(us, self)
     end
 
     class Items
       include Config
 
       attr_accessor :us, :you, :items, :register_response, :summary_response
+
+      CREDENTIAL_CONVERT = {:is_optional_mfa => "IsOptionalMFA", 
+                            :is_mfa => "IsMFA"}
+      CREDENTIAL_ORDER = [:name,
+                          :display_name,
+                          :is_editable,
+                          :is_optional,
+                          :is_escaped,
+                          :is_optional_mfa,
+                          :is_mfa,
+                          :value,
+                          :value_identifier,
+                          :value_mask,
+                          :field_type,
+                          :size,
+                          :maxlength]
 
       def initialize(us, you, opts = {})
         @us = us
@@ -394,6 +410,13 @@ module Halberd
       def register!(content_service_id, opts = {})
         credentials = opts[:credentials]
 
+        credentials && credentials.map! do |credential|
+          CREDENTIAL_ORDER.inject({}) do |hsh, key|
+            hsh[CREDENTIAL_CONVERT[key] || key] = credential[key]
+            hsh
+          end
+        end
+
         @register_response = item_client.request :sl, :add_item_for_content_service1 do
           soap.element_form_default = :unqualified
           soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
@@ -441,6 +464,7 @@ module Halberd
         end
 
         item_registered!
+        register_response.to_hash[:add_item_for_content_service1_response][:add_item_for_content_service1_return]
       end
 
       def item_registered!
