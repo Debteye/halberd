@@ -86,6 +86,14 @@ module Halberd
         wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/ContentServiceTraversalService"
       end
     end
+    
+    def category_client
+      @category_client ||= Savon::Client.new do
+        wsdl.namespace = "http://transactioncategorizationservice.transactioncategorization.core.soap.yodlee.com"
+        wsdl.endpoint  = "#{YODLEE_PROXY}/yodsoap/services/TransactionCategorizationService"
+      end
+    end
+
   end
 
   class Us
@@ -147,6 +155,35 @@ module Halberd
    
       def initialize(us)
         @us = us
+      end
+
+      def get_category_list
+        @category_list = category_client.request :sl, :get_supported_transaction_categrories do
+          soap.element_form_default = :unqualified
+          soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
+          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
+          soap.body = {
+            :cobrandContext => {
+              :cobrand_id      => credentials.cobrand_id,
+              :channel_id      => us.channel_id,
+              :locale          => credentials.locale,
+              :tnc_version     => credentials.tnc_version,
+              :application_id  => credentials.application_id,
+              :cobrand_conversation_credentials => {
+                :session_token => us.session_token,
+              },
+              :order! => [:cobrand_id, :channel_id, :locale, :tnc_version, :application_id, :cobrand_conversation_credentials],
+              :attributes! => {
+                :locale => { "xsi:type" => "tns1:Locale" },
+                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
+              } 
+            },
+            :order! => [:cobrandContext],
+            :attributes! => {
+              :cobrand_context => { "xsi:type" => "tns1:CobrandContext" }
+            } 
+          } 
+        end
       end
 
       def get_service_list(container_name)
