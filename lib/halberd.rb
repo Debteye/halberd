@@ -90,7 +90,7 @@ module Halberd
     def category_client
       @category_client ||= Savon::Client.new do
         wsdl.namespace = "http://transactioncategorizationservice.transactioncategorization.core.soap.yodlee.com"
-        wsdl.endpoint  = "#{YODLEE_PROXY}/yodsoap/services/TransactionCategorizationService"
+        wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/TransactionCategorizationService"
       end
     end
 
