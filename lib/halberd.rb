@@ -447,7 +447,7 @@ module Halberd
                      :data_service_lite => true,
                      :inactive_item_accounts_needed => false,
                      :include_is_historic_bill_needed => true,
-                     :include_shared_accounts => false,
+                     :include_shared_accounts => true,
                      :attributes! => { :containerCriteria => {"xsi:type" => "collections:List" }}
                     },
             :item_ids => {
