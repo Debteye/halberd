@@ -435,19 +435,19 @@ module Halberd
               }
             },
             :req => {
-                     :containerCriteria => {:elements => [{:container_type => "all",
+                     :containerCriteria => {:elements => [{:container_type => "bank",
                                                            :data_extent => {:start_level => 0, :end_level => 4}
                                                           }],
                                             :attributes! => {:elements => {'xsi:type' => 'dataservice:ContainerCriteria'}}
                                            },
-                     :history_needed => true,
-                     :deleted_item_accounts_needed => false,
-                     :include_disabled_items => false,
-                     :content_service_info_required => true,
-                     :data_service_lite => true,
-                     :inactive_item_accounts_needed => false,
-                     :include_is_historic_bill_needed => true,
-                     :include_shared_accounts => true,
+                     :history_needed => true, 
+                     :deleted_item_accounts_needed => false, 
+                     :include_disabled_items => false, 
+                     :content_service_info_required => false, 
+                     :data_service_lite => false, 
+                     :inactive_item_accounts_needed => false, 
+                     :include_is_historic_bill_needed => false, 
+                     :include_shared_accounts => false,
                      :attributes! => { :containerCriteria => {"xsi:type" => "collections:List" }}
                     },
             :item_ids => {
