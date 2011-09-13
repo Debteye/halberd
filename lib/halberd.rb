@@ -440,14 +440,14 @@ module Halberd
                                                           }],
                                             :attributes! => {:elements => {'xsi:type' => 'dataservice:ContainerCriteria'}}
                                            },
-                     :history_needed => true,
+                     :history_needed => false,
                      :deleted_item_accounts_needed => false,
                      :include_disabled_items => false,
-                     :content_service_info_required => true,
-                     :data_service_lite => true,
+                     :content_service_info_required => false,
+                     :data_service_lite => false,
                      :inactive_item_accounts_needed => false,
-                     :include_is_historic_bill_needed => true,
-                     :include_shared_accounts => true,
+                     :include_is_historic_bill_needed => false,
+                     :include_shared_accounts => false,
                      :attributes! => { :containerCriteria => {"xsi:type" => "collections:List" }}
                     },
             :item_ids => {
