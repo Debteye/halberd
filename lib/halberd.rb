@@ -49,6 +49,7 @@ module Halberd
       @cobrand_client ||= Savon::Client.new do
         wsdl.namespace = "http://cobrandlogin.login.core.soap.yodlee.com"
         wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/CobrandLoginService"
+        http.auth.ssl.verify_mode = :none
       end
     end
   
@@ -56,6 +57,7 @@ module Halberd
       @registration_client ||= Savon::Client.new do
         wsdl.namespace = "http://userregistration.usermanagement.core.soap.yodlee.com"
         wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/UserRegistrationService?wsdl"
+        http.auth.ssl.verify_mode = :none
       end
     end
 
@@ -63,6 +65,7 @@ module Halberd
       @login_client ||= Savon::Client.new do
         wsdl.namespace = "http://login.login.core.soap.yodlee.com"
         wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/LoginService?wsdl"
+        http.auth.ssl.verify_mode = :none
       end
     end
  
@@ -70,6 +73,7 @@ module Halberd
       @item_client ||= Savon::Client.new do
         wsdl.namespace = "http://itemmanagement.accountmanagement.core.soap.yodlee.com"
         wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/ItemManagementService"
+        http.auth.ssl.verify_mode = :none
       end
     end
    
@@ -77,6 +81,7 @@ module Halberd
       @dataservice_client ||= Savon::Client.new do
         wsdl.namespace = "http://dataservice.dataservice.core.soap.yodlee.com"
         wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/DataService?wsdl"
+        http.auth.ssl.verify_mode = :none
       end
     end
 
@@ -84,6 +89,7 @@ module Halberd
       @content_traversal_client ||= Savon::Client.new do
         wsdl.namespace = "http://contentservicetraversal.traversal.ext.soap.yodlee.com"
         wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/ContentServiceTraversalService"
+        http.auth.ssl.verify_mode = :none
       end
     end
     
@@ -91,6 +97,7 @@ module Halberd
       @category_client ||= Savon::Client.new do
         wsdl.namespace = "http://transactioncategorizationservice.transactioncategorization.core.soap.yodlee.com"
         wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/TransactionCategorizationService"
+        http.auth.ssl.verify_mode = :none
       end
     end
 
@@ -440,13 +447,13 @@ module Halberd
                                                           }],
                                             :attributes! => {:elements => {'xsi:type' => 'dataservice:ContainerCriteria'}}
                                            },
-                     :history_needed => true, 
-                     :deleted_item_accounts_needed => false, 
-                     :include_disabled_items => false, 
-                     :content_service_info_required => false, 
-                     :data_service_lite => false, 
-                     :inactive_item_accounts_needed => false, 
-                     :include_is_historic_bill_needed => false, 
+                     :history_needed => true,
+                     :deleted_item_accounts_needed => false,
+                     :include_disabled_items => false,
+                     :content_service_info_required => false,
+                     :data_service_lite => false,
+                     :inactive_item_accounts_needed => false,
+                     :include_is_historic_bill_needed => false,
                      :include_shared_accounts => false,
                      :attributes! => { :containerCriteria => {"xsi:type" => "collections:List" }}
                     },
