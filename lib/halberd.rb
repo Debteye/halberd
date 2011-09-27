@@ -548,7 +548,7 @@ module Halberd
                 :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
               }
             },
-            :item_ids => item_id,
+            :item_id => item_id,
             :order! => [:user_context, :item_id],
             :attributes! => {
               :user_context => { "xsi:type" => "common:UserContext" },
