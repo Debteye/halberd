@@ -519,7 +519,7 @@ module Halberd
         end
       end
 
-      def instant_account_verification_status(item_ids = [])
+      def instant_account_verification_status
         item_verification = instant_verification_client.request :sl, :get_item_verification_data do
           soap.element_form_default = :unqualified
           soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
@@ -549,7 +549,7 @@ module Halberd
               }
             },
             :item_ids => {
-              :elements => item_ids,
+              :elements => items,
             },
             :order! => [:user_context, :item_ids],
             :attributes! => {
@@ -564,7 +564,7 @@ module Halberd
 
       def instant_account_verification_register!(content_service_id, opts = {})
         user_credentials = opts[:credentials]
-
+                   
         user_credentials && user_credentials.map! do |credential|
           CREDENTIAL_ORDER.inject({}) do |hsh, key|
             hsh[CREDENTIAL_CONVERT[key] || key] = credential[key]
