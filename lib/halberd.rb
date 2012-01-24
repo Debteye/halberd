@@ -480,7 +480,10 @@ module Halberd
               }
             },
             :req => {
-                     :containerCriteria => {:elements => [{#:container_type => "bank",
+                     :containerCriteria => {:elements => [{:container_type => "bank",
+                                                           :data_extent => {:start_level => 0, :end_level => 4}
+                                                          },
+                                                          {:container_type => "credits",
                                                            :data_extent => {:start_level => 0, :end_level => 4}
                                                           }],
                                             :attributes! => {:elements => {'xsi:type' => 'dataservice:ContainerCriteria'}}
