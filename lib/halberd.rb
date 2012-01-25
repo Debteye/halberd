@@ -177,7 +177,7 @@ module Halberd
           soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
           soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
           soap.body = {
-            :cctx => {
+            :cobrandContext => {
               :cobrand_id      => credentials.cobrand_id,
               :channel_id      => us.channel_id,
               :locale          => credentials.locale,
