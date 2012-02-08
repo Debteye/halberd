@@ -591,7 +591,7 @@ module Halberd
       end
 
       def get_mfa_response(item_id)
-         @refresh_response = refresh_client.request :lines, :get_MFA_response do
+         @refresh_response = refresh_client.request :lines, 'getMFAResponse' do
           soap.element_form_default = :unqualified
           soap.namespaces['xmlns:collections'] = "http://collections.soap.yodlee.com"
           soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
