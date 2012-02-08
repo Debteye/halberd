@@ -11,7 +11,7 @@ module Halberd
   
   class Credentials
     attr_accessor :cobrand_id, :application_id, :locale, :tnc_version,
-      :cobrand_login, :cobrand_password
+                  :cobrand_login, :cobrand_password
     def initialize
       yield self
     end
@@ -73,6 +73,14 @@ module Halberd
       @item_client ||= Savon::Client.new do
         wsdl.namespace = "http://itemmanagement.accountmanagement.core.soap.yodlee.com"
         wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/ItemManagementService"
+        http.auth.ssl.verify_mode = :none
+      end
+    end
+
+    def refresh_client
+      @refresh_client ||= Savon::Client.new do
+        wsdl.namespace = "http://refresh.refresh.core.soap.yodlee.com"
+        wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/Refresh?wsdl"
         http.auth.ssl.verify_mode = :none
       end
     end
@@ -582,6 +590,89 @@ module Halberd
         end
       end
 
+      def get_mfa_response(item_id)
+         @refresh_response = refresh_client.request :lines, :get_MFA_response do
+          soap.element_form_default = :unqualified
+          soap.namespaces['xmlns:collections'] = "http://collections.soap.yodlee.com"
+          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
+          soap.namespaces['xmlns:common'] = 'http://common.soap.yodlee.com'
+          soap.body = {
+            :user_context => {
+              :cobrand_id      => credentials.cobrand_id,
+              :channel_id      => us.channel_id,
+              :locale          => credentials.locale,
+              :tnc_version     => credentials.tnc_version,
+              :application_id  => credentials.application_id,
+              :cobrand_conversation_credentials => {
+                :session_token => us.session_token,
+              },
+              :preference_info => prefs,
+              :conversation_credentials => {
+                :session_token => you.session_token 
+              },
+              :valid => true,
+              :is_password_expired => false,
+              :order! => [:cobrand_id, :channel_id, :locale, :tnc_version, :application_id, 
+                          :cobrand_conversation_credentials, :preference_info, 
+                          :conversation_credentials, :valid, :is_password_expired],
+              :attributes! => {
+                :locale => { "xsi:type" => "collections:Locale" },
+                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
+                :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
+              }
+            },
+            :item_id => item_id,
+            :order! => [:user_context, :item_id],
+            :attributes! => {
+              :user_context => { "xsi:type" => "common:UserContext"},
+            }
+          }
+        end
+      end
+
+      def get_refresh_info1
+        @refresh_response = refresh_client.request :lines, :get_refresh_info1 do
+          soap.element_form_default = :unqualified
+          soap.namespaces['xmlns:collections'] = "http://collections.soap.yodlee.com"
+          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
+          soap.namespaces['xmlns:common'] = 'http://common.soap.yodlee.com'
+          soap.body = {
+            :user_context => {
+              :cobrand_id      => credentials.cobrand_id,
+              :channel_id      => us.channel_id,
+              :locale          => credentials.locale,
+              :tnc_version     => credentials.tnc_version,
+              :application_id  => credentials.application_id,
+              :cobrand_conversation_credentials => {
+                :session_token => us.session_token,
+              },
+              :preference_info => prefs,
+              :conversation_credentials => {
+                :session_token => you.session_token 
+              },
+              :valid => true,
+              :is_password_expired => false,
+              :order! => [:cobrand_id, :channel_id, :locale, :tnc_version, :application_id, 
+                          :cobrand_conversation_credentials, :preference_info, 
+                          :conversation_credentials, :valid, :is_password_expired],
+              :attributes! => {
+                :locale => { "xsi:type" => "collections:Locale" },
+                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
+                :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
+              }
+            },
+            :item_ids => {
+                          :elements => items 
+                         },
+            :order! => [:user_context, :item_ids],
+            :attributes! => {
+              :user_context => { "xsi:type" => "common:UserContext"},
+              :item_ids => { "xsi:type" => "collections:ArrayOflong"}
+            }
+          }
+        end
+      end
+
       def start_verification_data_request1(item_id)
         item_verification = instant_verification_client.request :sl, :start_verification_data_request1 do
           soap.element_form_default = :unqualified
@@ -725,6 +816,7 @@ module Halberd
 
       def register!(content_service_id, opts = {})
         user_credentials = opts[:credentials]
+        refresh = opts[:refresh].nil? true : opts[:refresh]
 
         user_credentials && user_credentials.map! do |credential|
           CREDENTIAL_ORDER.inject({}) do |hsh, key|
@@ -771,7 +863,7 @@ module Halberd
               }
             },
             :share_credentials_within_site => true,
-            :start_refresh_item_on_addition => true,
+            :start_refresh_item_on_addition => refresh,
             :order! => [:user_context, :content_service_id, :credential_fields, :share_credentials_within_site, :start_refresh_item_on_addition],
             :attributes! => {
               :user_context => { "xsi:type" => "common:UserContext" },
