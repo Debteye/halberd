@@ -80,7 +80,7 @@ module Halberd
     def refresh_client
       @refresh_client ||= Savon::Client.new do
         wsdl.namespace = "http://refresh.refresh.core.soap.yodlee.com"
-        wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/Refresh?wsdl"
+        wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/RefreshService?wsdl"
         http.auth.ssl.verify_mode = :none
       end
     end
