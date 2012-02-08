@@ -630,8 +630,8 @@ module Halberd
         end
       end
 
-      def start_refresh
-        @refresh_response = refresh_client.request :lines, :start_refresh do
+      def start_refresh1(force = false)
+        @refresh_response = refresh_client.request :lines, :start_refresh1 do
           soap.element_form_default = :unqualified
           soap.namespaces['xmlns:collections'] = "http://collections.soap.yodlee.com"
           soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
@@ -665,7 +665,8 @@ module Halberd
                           :elements => items 
                          },
             :refresh_priority => 2,
-            :order! => [:user_context, :item_ids, :refresh_priority],
+            :force_refresh => force,
+            :order! => [:user_context, :item_ids, :refresh_priority, :force_refresh],
             :attributes! => {
               :user_context => { "xsi:type" => "common:UserContext"},
               :item_ids => { "xsi:type" => "collections:ArrayOflong"}
