@@ -816,7 +816,7 @@ module Halberd
 
       def register!(content_service_id, opts = {})
         user_credentials = opts[:credentials]
-        refresh = opts[:refresh].nil? true : opts[:refresh]
+        refresh = opts[:refresh].nil? ? true : opts[:refresh]
 
         user_credentials && user_credentials.map! do |credential|
           CREDENTIAL_ORDER.inject({}) do |hsh, key|
