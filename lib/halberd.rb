@@ -590,6 +590,72 @@ module Halberd
         end
       end
 
+      def put_mfa_request(item_id, opts = {})
+        case opts[:type]
+        when :token
+          user_response_type = "MFATokenResponse"
+          user_response = {
+            :token => opts[:token]
+          }
+        when :image
+          user_response_type = "MFAImageResponse"
+          user_response = {
+            :image_string => opts[:image_string]
+          }
+        else
+          user_response_type = "MFAQuesAnsResponse"
+          user_response = {
+            :ques_ans_detail_array => {
+              :elements => opts[:qa].map {|hash| hash.merge(:order! => [:question, :answer, :question_field_type, :answer_field_type])},
+              :attributes! => {:elements => {"xsi:type" => "mfarefresh:QuesAndAnswerDetails"}}
+            },
+            :attributes! => {:ques_ans_detail_array => {"xsi:type" => "mfacollections:ArrayOfQuesAndAnswerDetails"}}
+            }
+        end
+        @put_mfa_response = refresh_client.request :lines, 'putMFARequest' do
+          soap.element_form_default = :unqualified
+          soap.namespaces['xmlns:collections'] = "http://collections.soap.yodlee.com"
+          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
+          soap.namespaces['xmlns:common'] = 'http://common.soap.yodlee.com'
+          soap.namespaces['xmlns:mfarefresh'] = 'http://mfarefresh.core.soap.yodlee.com'
+          soap.namespaces['xmlns:mfacollections'] = 'http://mfarefresh.core.collection.soap.yodlee.com'
+          soap.body = {
+            :user_context => {
+              :cobrand_id      => credentials.cobrand_id,
+              :channel_id      => us.channel_id,
+              :locale          => credentials.locale,
+              :tnc_version     => credentials.tnc_version,
+              :application_id  => credentials.application_id,
+              :cobrand_conversation_credentials => {
+                :session_token => us.session_token,
+              },
+              :preference_info => prefs,
+              :conversation_credentials => {
+                :session_token => you.session_token 
+              },
+              :valid => true,
+              :is_password_expired => false,
+              :order! => [:cobrand_id, :channel_id, :locale, :tnc_version, :application_id, 
+                          :cobrand_conversation_credentials, :preference_info, 
+                          :conversation_credentials, :valid, :is_password_expired],
+              :attributes! => {
+                :locale => { "xsi:type" => "collections:Locale" },
+                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
+                :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
+              }
+            },
+            :user_response => user_response,
+            :item_id => item_id,
+            :order! => [:user_context, :user_response,:item_id],
+            :attributes! => {
+              :user_context => { "xsi:type" => "common:UserContext"},
+              :user_response => { "xsi:type" => "mfarefresh:#{user_response_type}" }
+            }
+          }
+        end
+      end
+
+
       def get_mfa_response(item_id)
          @refresh_response = refresh_client.request :lines, 'getMFAResponse' do
           soap.element_form_default = :unqualified
