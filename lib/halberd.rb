@@ -696,6 +696,53 @@ module Halberd
         end
       end
 
+      def start_refresh7(item_id, opts = {})
+        @refresh_response = refresh_client.request :lines, :start_refresh7 do
+          soap.element_form_default = :unqualified
+          soap.namespaces['xmlns:collections'] = "http://collections.soap.yodlee.com"
+          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
+          soap.namespaces['xmlns:common'] = 'http://common.soap.yodlee.com'
+          soap.namespaces['xmlns:refresh'] = 'http://refresh.core.soap.yodlee.com'
+          soap.body = {
+            :user_context => {
+              :cobrand_id      => credentials.cobrand_id,
+              :channel_id      => us.channel_id,
+              :locale          => credentials.locale,
+              :tnc_version     => credentials.tnc_version,
+              :application_id  => credentials.application_id,
+              :cobrand_conversation_credentials => {
+                :session_token => us.session_token,
+              },
+              :preference_info => prefs,
+              :conversation_credentials => {
+                :session_token => you.session_token 
+              },
+              :valid => true,
+              :is_password_expired => false,
+              :order! => [:cobrand_id, :channel_id, :locale, :tnc_version, :application_id, 
+                          :cobrand_conversation_credentials, :preference_info, 
+                          :conversation_credentials, :valid, :is_password_expired],
+              :attributes! => {
+                :locale => { "xsi:type" => "collections:Locale" },
+                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
+                :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
+              }
+            },
+            :item_id => item_id,
+            :refresh_parameters => {:force_refresh => opts[:force],
+                                    :refresh_mode => {:value => opts[:mfa] ? "MFA_REFRESH_MODE" : "NORMAL_REFRESH_MODE"},
+                                    :refresh_priority => 2,
+                                    :attributes => {:refresh_mode => {'xsi:type' => 'refresh:RefreshMode'}}
+                                   },
+            :order! => [:user_context, :item_id, :refresh_parameters],
+            :attributes! => {
+              :user_context => { "xsi:type" => "common:UserContext"},
+              :refresh_parameters => { "xsi:type" => "refresh:RefreshParameters"},
+            }
+          }
+        end
+      end
+
       def start_refresh1(force = false)
         @refresh_response = refresh_client.request :lines, :start_refresh1 do
           soap.element_form_default = :unqualified
@@ -782,6 +829,46 @@ module Halberd
             }
           }
         end
+      end
+
+      def get_login_form_credentials_for_item(item_id)
+        item = item_client.request :sl, :get_login_form_credentials_for_item do
+          soap.element_form_default = :unqualified
+          soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
+          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
+          soap.namespaces['xmlns:common'] = 'http://common.soap.yodlee.com'
+          soap.body = {
+            :user_context => {
+              :cobrand_id      => credentials.cobrand_id,
+              :channel_id      => us.channel_id, 
+              :locale          => credentials.locale,
+              :tnc_version     => credentials.tnc_version,
+              :application_id  => credentials.application_id,
+              :cobrand_conversation_credentials => {
+                :session_token => us.session_token
+              },
+              :preference_info => prefs,
+              :conversation_credentials => {
+                :session_token => you.session_token 
+              },
+              :valid => true,
+              :is_password_expired => false,
+              :order! => [:cobrand_id, :channel_id, :locale, :tnc_version, :application_id, :cobrand_conversation_credentials, :preference_info, :conversation_credentials, :valid, :is_password_expired],
+              :attributes! => {
+                :locale => { "xsi:type" => "collections:Locale" },
+                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
+                :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
+              }
+            },
+            :item_id => item_id,
+            :order! => [:user_context, :item_id],
+            :attributes! => {
+              :user_context => { "xsi:type" => "common:UserContext" },
+            }
+          }
+        end
+
+        item
       end
 
       def start_verification_data_request1(item_id)
