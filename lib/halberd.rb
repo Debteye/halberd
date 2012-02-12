@@ -730,9 +730,10 @@ module Halberd
             },
             :item_id => item_id,
             :refresh_parameters => {:force_refresh => opts[:force],
-                                    :refresh_mode => {:value => opts[:mfa] ? "MFA_REFRESH_MODE" : "NORMAL_REFRESH_MODE"},
+                                    :refresh_mode => opts[:mfa] ? "MFA_REFRESH_MODE" : "NORMAL_REFRESH_MODE",
                                     :refresh_priority => 2,
-                                    :attributes => {:refresh_mode => {'xsi:type' => 'refresh:RefreshMode'}}
+                                    :order! => [:refresh_priority, :force_refresh, :refresh_mode],
+                                    :attributes! => {:refresh_mode => {'xsi:type' => 'refresh:RefreshMode'}}
                                    },
             :order! => [:user_context, :item_id, :refresh_parameters],
             :attributes! => {
