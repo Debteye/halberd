@@ -150,6 +150,12 @@ module Halberd
 
       set_connected_status!
     end
+    
+    def set_connection(opts = {})
+      @session_token = opts[:session_token]
+      @channel_id = opts[:channel_id]
+      @timeout_time = opts[:timeout_time]
+    end
 
     def set_connected_status!
       response_hash = response.to_hash
