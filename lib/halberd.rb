@@ -1,10 +1,11 @@
 require 'savon_model'
 require 'orderedhash'
+require './lib/utils'
 
 Savon.configure do |config|
   config.soap_version = 2
   config.log_level = :info
-  config.log = false
+  config.log = true
 end
 
 module Halberd 
@@ -460,6 +461,7 @@ module Halberd
 
       CREDENTIAL_CONVERT = {:is_optional_mfa => "isOptionalMFA", 
                             :is_mfa => "isMFA"}
+
       CREDENTIAL_ORDER = [:name,
                           :display_name,
                           :is_editable,
@@ -467,12 +469,25 @@ module Halberd
                           :is_escaped,
                           :is_optional_mfa,
                           :is_mfa,
+                          :default_values,
                           :value,
-                          :value_identifier,
+                          :values,
+                          :valid_values,
+                          :display_valid_values,
+                          :value_identifier, 
+                          :value_identifiers, 
                           :value_mask,
+                          :value_masks,
                           :field_type,
+                          :field_types,
+                          :validation_rules,
                           :size,
-                          :maxlength]
+                          :sizes,
+                          :maxlength,
+                          :maxlengths,
+                          :user_profile_mapping_expressions,
+                          :"@xsi:type"]
+
 
       def initialize(us, you, opts = {})
         @us = us
@@ -1065,17 +1080,53 @@ module Halberd
 
         user_credentials && user_credentials.map! do |credential|
           CREDENTIAL_ORDER.inject({}) do |hsh, key|
-            hsh[CREDENTIAL_CONVERT[key] || key] = credential[key]
+            hsh[CREDENTIAL_CONVERT[key] || key] = credential[key] unless credential[key].nil?
             hsh
           end
         end
-
+ 
         @register_response = item_client.request :sl, :add_item_for_content_service1 do
           soap.element_form_default = :unqualified
           soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
           soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
           soap.namespaces['xmlns:common'] = 'http://common.soap.yodlee.com'
-          soap.body = {
+
+          soap.body do |xml|
+            xml.userContext("xsi:type" => "common:UserContext") do
+              xml.cobrandId(credentials.cobrand_id)
+              xml.channelId(us.channel_id)
+              xml.locale("xsi:type" => "collections:Locale") do
+                credentials.locale.each_pair do |k,v|
+                  xml.tag!(k,v)
+                end
+              end
+              xml.tncVersion(credentials.tnc_version)
+              xml.applicationId(credentials.application_id)
+              xml.cobrandConversationCredentials("xsi:type" => "login:SessionCredentials") do
+                xml.sessionToken(us.session_token)
+              end
+              xml.preferenceInfo do 
+                prefs.each_pair do |k,v| 
+                  xml.tag!(k, v)
+                end
+              end
+              xml.conversationCredentials("xsi:type" => "login:SessionCredentials") do
+                xml.sessionToken(you.session_token)
+              end
+              xml.valid(true)
+              xml.isPasswordExpired(false)
+            end
+            
+            xml.contentServiceId(content_service_id)
+            xml.credentialFields do
+              Halberd::Utils.new.tag_xml(xml, 'elements', user_credentials)
+            end 
+            
+            xml.shareCredentialsWithinSite(true)
+            xml.startRefreshItemOnAddition(refresh)
+          end
+=begin
+                    = {
             :user_context => {
               :cobrand_id      => credentials.cobrand_id,
               :channel_id      => us.channel_id,
@@ -1101,12 +1152,13 @@ module Halberd
               }
             },
             :content_service_id => content_service_id,
-            :credential_fields => {
-              :elements => user_credentials,
-              :attributes! => {
-                :elements => { "xsi:type" => "common:FieldInfoSingle" },
-              }
-            },
+            :credential_fields => credential_fields,
+             #{
+             # :elements => user_credentials,
+             # :attributes! => {
+             #   :elements => { "xsi:type" => "common:FieldInfoSingle" },
+             #}
+             #},
             :share_credentials_within_site => true,
             :start_refresh_item_on_addition => refresh,
             :order! => [:user_context, :content_service_id, :credential_fields, :share_credentials_within_site, :start_refresh_item_on_addition],
@@ -1114,6 +1166,7 @@ module Halberd
               :user_context => { "xsi:type" => "common:UserContext" },
             }
           }
+=end
         end
 
         item_registered!
