@@ -1,6 +1,5 @@
 require 'savon_model'
 require 'orderedhash'
-require './lib/utils'
 
 Savon.configure do |config|
   config.soap_version = 2
