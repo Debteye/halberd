@@ -1,10 +1,11 @@
 require 'savon_model'
 require 'orderedhash'
+require 'halberd/utils'
 
 Savon.configure do |config|
   config.soap_version = 2
   config.log_level = :info
-  config.log = true
+  config.log = false
 end
 
 module Halberd 
