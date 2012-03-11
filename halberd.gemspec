@@ -24,7 +24,6 @@ Gem::Specification.new do |s|
     "config/halberd.yml",
     "halberd.gemspec",
     "lib/halberd.rb",
-    "lib/utils.rb",
     "spec/halberd_spec.rb",
     "spec/spec_helper.rb"
   ]
