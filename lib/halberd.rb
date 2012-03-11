@@ -1073,7 +1073,8 @@ module Halberd
         @items << register_response.to_hash[:add_item_and_start_verification_data_request1_response][:add_item_and_start_verification_data_request1_return]
         register_response.to_hash[:add_item_and_start_verification_data_request1_response][:add_item_and_start_verification_data_request1_return]
       end
-     def register_alt!(content_service_id, opts = {})
+
+      def register!(content_service_id, opts = {})
         user_credentials = opts[:credentials]
         refresh = opts[:refresh].nil? ? true : opts[:refresh]
 
@@ -1124,31 +1125,8 @@ module Halberd
             xml.shareCredentialsWithinSite(true)
             xml.startRefreshItemOnAddition(refresh)
           end
-        end
-
-        item_registered!
-        register_response.to_hash[:add_item_for_content_service1_response][:add_item_for_content_service1_return]
-
-      end
-
-      def register!(content_service_id, opts = {})
-        user_credentials = opts[:credentials]
-        refresh = opts[:refresh].nil? ? true : opts[:refresh]
-
-        user_credentials && user_credentials.map! do |credential|
-          CREDENTIAL_ORDER.inject({}) do |hsh, key|
-            hsh[CREDENTIAL_CONVERT[key] || key] = credential[key] unless credential[key].nil?
-            hsh
-          end
-        end
- 
-        @register_response = item_client.request :sl, :add_item_for_content_service1 do
-          soap.element_form_default = :unqualified
-          soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
-          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
-          soap.namespaces['xmlns:common'] = 'http://common.soap.yodlee.com'
-
-          soap.body = {
+=begin
+                    = {
             :user_context => {
               :cobrand_id      => credentials.cobrand_id,
               :channel_id      => us.channel_id,
@@ -1174,12 +1152,13 @@ module Halberd
               }
             },
             :content_service_id => content_service_id,
-            :credential_fields => {
-              :elements => user_credentials,
-              :attributes! => {
-                :elements => { "xsi:type" => "common:FieldInfoSingle" },
-             }
-            },
+            :credential_fields => credential_fields,
+             #{
+             # :elements => user_credentials,
+             # :attributes! => {
+             #   :elements => { "xsi:type" => "common:FieldInfoSingle" },
+             #}
+             #},
             :share_credentials_within_site => true,
             :start_refresh_item_on_addition => refresh,
             :order! => [:user_context, :content_service_id, :credential_fields, :share_credentials_within_site, :start_refresh_item_on_addition],
@@ -1187,6 +1166,7 @@ module Halberd
               :user_context => { "xsi:type" => "common:UserContext" },
             }
           }
+=end
         end
 
         item_registered!
