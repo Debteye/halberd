@@ -526,6 +526,24 @@ module Halberd
                      :containerCriteria => {:elements => [{:container_type => "bank",
                                                            :data_extent => {:start_level => 0, :end_level => 4}
                                                           },
+                                                          {:container_type => "isp",
+                                                           :data_extent => {:start_level => 0, :end_level => 4}
+                                                          },
+                                                          {:container_type => "utilities",
+                                                           :data_extent => {:start_level => 0, :end_level => 4}
+                                                          },
+                                                          {:container_type => "bills",
+                                                           :data_extent => {:start_level => 0, :end_level => 4}
+                                                          },
+                                                          {:container_type => "cable_satellite",
+                                                           :data_extent => {:start_level => 0, :end_level => 4}
+                                                          },
+                                                          {:container_type => "loan",
+                                                           :data_extent => {:start_level => 0, :end_level => 4}
+                                                          },
+                                                          {:container_type => "telephone",
+                                                           :data_extent => {:start_level => 0, :end_level => 4}
+                                                          },
                                                           {:container_type => "credits",
                                                            :data_extent => {:start_level => 0, :end_level => 4}
                                                           }],
