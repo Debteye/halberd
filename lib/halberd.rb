@@ -473,6 +473,31 @@ module Halberd
                           :field_type,
                           :size,
                           :maxlength]
+      ALT_CRED_ORDER   = [:name,
+                          :display_name,
+                          :is_editable,
+                          :is_optional,
+                          :is_escaped,
+                          :is_optional_mfa,
+                          :is_mfa,
+                          :default_values,
+                          :value,
+                          :values,
+                          :valid_values,
+                          :display_valid_values,
+                          :value_identifier, 
+                          :value_identifiers, 
+                          :value_mask,
+                          :value_masks,
+                          :field_type,
+                          :field_types,
+                          :validation_rules,
+                          :size,
+                          :sizes,
+                          :maxlength,
+                          :maxlengths,
+                          :user_profile_mapping_expressions,
+                          :"@xsi:type"]
 
       def initialize(us, you, opts = {})
         @us = us
@@ -1132,6 +1157,63 @@ module Halberd
               :user_context => { "xsi:type" => "common:UserContext" },
             }
           }
+        end
+
+        item_registered!
+        register_response.to_hash[:add_item_for_content_service1_response][:add_item_for_content_service1_return]
+      end
+
+      def register_alt!(content_service_id, opts = {})
+        user_credentials = opts[:credentials]
+        refresh = opts[:refresh].nil? ? true : opts[:refresh]
+
+        user_credentials && user_credentials.map! do |credential|
+          ALT_CRED_ORDER.inject({}) do |hsh, key|
+            hsh[CREDENTIAL_CONVERT[key] || key] = credential[key] unless credential[key].nil?
+            hsh
+          end
+        end
+ 
+        @register_response = item_client.request :sl, :add_item_for_content_service1 do
+          soap.element_form_default = :unqualified
+          soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
+          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
+          soap.namespaces['xmlns:common'] = 'http://common.soap.yodlee.com'
+
+          soap.body do |xml|
+            xml.userContext("xsi:type" => "common:UserContext") do
+              xml.cobrandId(credentials.cobrand_id)
+              xml.channelId(us.channel_id)
+              xml.locale("xsi:type" => "collections:Locale") do
+                credentials.locale.each_pair do |k,v|
+                  xml.tag!(k,v)
+                end
+              end
+              xml.tncVersion(credentials.tnc_version)
+              xml.applicationId(credentials.application_id)
+              xml.cobrandConversationCredentials("xsi:type" => "login:SessionCredentials") do
+                xml.sessionToken(us.session_token)
+              end
+              xml.preferenceInfo do 
+                prefs.each_pair do |k,v| 
+                  xml.tag!(k, v)
+                end
+              end
+              xml.conversationCredentials("xsi:type" => "login:SessionCredentials") do
+                xml.sessionToken(you.session_token)
+              end
+              xml.valid(true)
+              xml.isPasswordExpired(false)
+            end
+            
+            xml.contentServiceId(content_service_id)
+            xml.credentialFields do
+              Halberd::Utils.new.tag_xml(xml, 'elements', user_credentials)
+            end 
+            
+            xml.shareCredentialsWithinSite(true)
+            xml.startRefreshItemOnAddition(refresh)
+          end
         end
 
         item_registered!
