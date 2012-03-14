@@ -20,7 +20,7 @@ module Halberd
     def tag_hash(xml, ele_name, cred)
       xsi_type = cred[:'@xsi:type']
       if xsi_type
-        xsi_type = xsi_type.gsub("ns1", "common")
+        xsi_type = xsi_type.gsub(/ns.+:/, "common")
         xml.tag!(ele_name.to_s.lower_camelcase, 'xsi:type' => xsi_type) do
           cred.each do |name, value|
             case value
