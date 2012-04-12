@@ -605,7 +605,7 @@ module Halberd
                                                           {:container_type => "cable_satellite",
                                                            :data_extent => {:start_level => 0, :end_level => 16}
                                                           },
-                                                          {:container_type => "loan",
+                                                          {:container_type => "loans",
                                                            :data_extent => {:start_level => 0, :end_level => 4}
                                                           },
                                                           {:container_type => "telephone",
