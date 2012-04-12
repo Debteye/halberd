@@ -606,7 +606,7 @@ module Halberd
                                                            :data_extent => {:start_level => 0, :end_level => 16}
                                                           },
                                                           {:container_type => "loans",
-                                                           :data_extent => {:start_level => 0, :end_level => 4}
+                                                           :data_extent => {:start_level => 0, :end_level => 16}
                                                           },
                                                           {:container_type => "telephone",
                                                            :data_extent => {:start_level => 0, :end_level => 16}
