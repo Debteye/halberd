@@ -516,6 +516,47 @@ module Halberd
         prefs
       end
 
+      def get_item_summary_for_item(item_id)
+        @detailed_summary_response = dataservice_client.request :lines, :get_item_summary_for_item do
+          soap.element_form_default = :unqualified
+          soap.namespaces['xmlns:collections'] = "http://collections.soap.yodlee.com"
+          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
+          soap.namespaces['xmlns:common'] = 'http://common.soap.yodlee.com'
+          soap.namespaces['xmlns:dataservice'] = "http://dataservice.core.soap.yodlee.com"
+          soap.body = {
+            :user_context => {
+              :cobrand_id      => credentials.cobrand_id,
+              :channel_id      => us.channel_id,
+              :locale          => credentials.locale,
+              :tnc_version     => credentials.tnc_version,
+              :application_id  => credentials.application_id,
+              :cobrand_conversation_credentials => {
+                :session_token => us.session_token,
+              },
+              :preference_info => prefs,
+              :conversation_credentials => {
+                :session_token => you.session_token 
+              },
+              :valid => true,
+              :is_password_expired => false,
+              :order! => [:cobrand_id, :channel_id, :locale, :tnc_version, :application_id, 
+                          :cobrand_conversation_credentials, :preference_info, 
+                          :conversation_credentials, :valid, :is_password_expired],
+              :attributes! => {
+                :locale => { "xsi:type" => "collections:Locale" },
+                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
+                :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
+              }
+            },
+            :item_id => item_id,
+            :order! => [:user_context, :item_id],
+            :attributes! => {
+              :user_context => { "xsi:type" => "common:UserContext"}
+            }
+          }
+        end
+      end
+
       def get_detailed_summary!
         @detailed_summary_response = dataservice_client.request :lines, :get_item_summaries2 do
           soap.element_form_default = :unqualified
