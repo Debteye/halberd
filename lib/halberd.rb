@@ -1190,9 +1190,8 @@ module Halberd
                 :elements => { "xsi:type" => "common:FieldInfoSingle" },
               }
             },
-            :share_credentials_within_site => true,
             :start_refresh_item_on_addition => refresh,
-            :order! => [:user_context, :item_id, :credential_fields, :share_credentials_within_site, :start_refresh_item_on_addition],
+            :order! => [:user_context, :item_id, :credential_fields, :start_refresh_item_on_update],
             :attributes! => {
               :user_context => { "xsi:type" => "common:UserContext" },
             }
@@ -1250,8 +1249,7 @@ module Halberd
               Halberd::Utils.new.tag_xml(xml, 'elements', user_credentials)
             end 
             
-            xml.shareCredentialsWithinSite(true)
-            xml.startRefreshItemOnAddition(refresh)
+            xml.startRefreshItemOnUpdate(refresh)
           end
         end
 
