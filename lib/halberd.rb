@@ -5,6 +5,7 @@ require 'halberd/utils'
 Savon.configure do |config|
   config.soap_version = 2
   config.logger.level = :info
+  config.log = false
 end
 
 module Halberd 
