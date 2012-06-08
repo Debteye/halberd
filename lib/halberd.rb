@@ -1190,7 +1190,7 @@ module Halberd
                 :elements => { "xsi:type" => "common:FieldInfoSingle" },
               }
             },
-            :start_refresh_item_on_addition => refresh,
+            :start_refresh_item_on_update => refresh,
             :order! => [:user_context, :item_id, :credential_fields, :start_refresh_item_on_update],
             :attributes! => {
               :user_context => { "xsi:type" => "common:UserContext" },
