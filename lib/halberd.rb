@@ -1198,7 +1198,7 @@ module Halberd
           }
         end
 
-        register_response.to_hash[:update_credentials_for_item1_response][:update_credentials_for_item1_return]
+        @update_response.to_hash
       end
 
       def update_credentials_alt(item_id, opts = {})
