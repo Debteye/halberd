@@ -1192,7 +1192,7 @@ module Halberd
             },
             :share_credentials_within_site => true,
             :start_refresh_item_on_addition => refresh,
-            :order! => [:user_context, :content_service_id, :credential_fields, :share_credentials_within_site, :start_refresh_item_on_addition],
+            :order! => [:user_context, :item_id, :credential_fields, :share_credentials_within_site, :start_refresh_item_on_addition],
             :attributes! => {
               :user_context => { "xsi:type" => "common:UserContext" },
             }
