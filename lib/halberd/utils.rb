@@ -8,9 +8,9 @@ module Halberd
           when Hash
             tag_hash(xml, ele_name, cred)
           when nil
-            xml.tag!(ele_name.to_s.lower_camelcase, nil, 'xsi:nil' => true)
+            xml.tag!(ele_name.to_s.camelcase(:lower), nil, 'xsi:nil' => true)
           else
-            xml.tag!(ele_name.to_s.lower_camelcase, cred) unless ele_name =~ /@/
+            xml.tag!(ele_name.to_s.camelcase(:lower), cred) unless ele_name =~ /@/
           end
         end
       end
@@ -21,7 +21,7 @@ module Halberd
       xsi_type = cred[:'@xsi:type']
       if xsi_type
         xsi_type = xsi_type.gsub(/ns.+:/, "common:")
-        xml.tag!(ele_name.to_s.lower_camelcase, 'xsi:type' => xsi_type) do
+        xml.tag!(ele_name.to_s.camelcase(:lower), 'xsi:type' => xsi_type) do
           cred.each do |name, value|
             case value
             when Array
@@ -29,14 +29,14 @@ module Halberd
             when Hash
               tag_hash(xml, name, value)
             when nil
-              xml.tag!(name.to_s.lower_camelcase, nil, 'xsi:nil' => true)
+              xml.tag!(name.to_s.camelcase(:lower), nil, 'xsi:nil' => true)
             else
-              xml.tag!(name.to_s.lower_camelcase, value) unless name =~ /@/
+              xml.tag!(name.to_s.camelcase(:lower), value) unless name =~ /@/
             end
           end
         end
       else
-        xml.tag!(ele_name.to_s.lower_camelcase) do
+        xml.tag!(ele_name.to_s.camelcase(:lower)) do
           cred.each do |name, value|
             case value
             when Array
@@ -44,9 +44,9 @@ module Halberd
             when Hash
               tag_hash(xml, name, value)
             when nil
-              xml.tag!(name.to_s.lower_camelcase, nil, 'xsi:nil' => true)
+              xml.tag!(name.to_s.camelcase(:lower), nil, 'xsi:nil' => true)
             else
-              xml.tag!(name.to_s.lower_camelcase, value) unless name =~ /@/
+              xml.tag!(name.to_s.camelcase(:lower), value) unless name =~ /@/
             end
           end
         end
