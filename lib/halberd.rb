@@ -5,7 +5,7 @@ require 'halberd/utils'
 Savon.configure do |config|
   config.soap_version = 2
   config.logger.level = :info
-  config.log = false
+  config.log = true
 end
 
 module Halberd 
@@ -40,6 +40,20 @@ module Halberd
         cr.locale           = @locale 
         cr.tnc_version      = config['credentials']['tnc_version'] 
       end
+    end
+
+    def preferences
+      {
+       :currency_code => "USD",
+       :time_zone => "CST",
+       :date_format => "MM/dd/yyyy",
+       :currency_notation_type => "SYMBOL_NOTATION", 
+       :number_format => {
+         :decimal_separator => ".",
+         :grouping_separator => ",", 
+         :group_pattern => "###,##0.##"
+       }
+      }
     end
 
     def yodlee_location
@@ -201,7 +215,8 @@ module Halberd
               :cobrand_conversation_credentials => {
                 :session_token => us.session_token,
               },
-              :order! => [:cobrand_id, :channel_id, :locale, :tnc_version, :application_id, :cobrand_conversation_credentials],
+              :preference_info => preferences,
+              :fetch_all_locale_data => false,
               :attributes! => {
                 :locale => { "xsi:type" => "tns1:Locale" },
                 :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
@@ -219,9 +234,10 @@ module Halberd
         @category_list = category_client.request :sl, :get_supported_transaction_categrories do
           soap.element_form_default = :unqualified
           soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
+          soap.namespaces['xmlns:tns2'] = "http://common.soap.yodlee.com"
           soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
           soap.body = {
-            :cobrandContext => {
+            :cobrand_context => {
               :cobrand_id      => credentials.cobrand_id,
               :channel_id      => us.channel_id,
               :locale          => credentials.locale,
@@ -230,15 +246,16 @@ module Halberd
               :cobrand_conversation_credentials => {
                 :session_token => us.session_token,
               },
-              :order! => [:cobrand_id, :channel_id, :locale, :tnc_version, :application_id, :cobrand_conversation_credentials],
+              :preference_info => preferences,
+              :fetch_all_locale_data => false,
               :attributes! => {
                 :locale => { "xsi:type" => "tns1:Locale" },
                 :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
               } 
             },
-            :order! => [:cobrandContext],
+            :order! => [:cobrand_context],
             :attributes! => {
-              :cobrand_context => { "xsi:type" => "tns1:CobrandContext" }
+              :cobrand_context => { "xsi:type" => "tns2:CobrandContext" }
             } 
           } 
         end
@@ -259,7 +276,8 @@ module Halberd
               :cobrand_conversation_credentials => {
                 :session_token => us.session_token,
               },
-              :order! => [:cobrand_id, :channel_id, :locale, :tnc_version, :application_id, :cobrand_conversation_credentials],
+              :preference_info => preferences,
+              :fetch_all_locale_data => false,
               :attributes! => {
                 :locale => { "xsi:type" => "tns1:Locale" },
                 :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
@@ -290,17 +308,15 @@ module Halberd
               :cobrand_conversation_credentials => {
                 :session_token => us.session_token,
               },
-              :order! => [:cobrand_id, :channel_id, :locale, :tnc_version, :application_id, :cobrand_conversation_credentials],
+              :preference_info => preferences,
+              :fetch_all_locale_data => false,
               :attributes! => {
                 :locale => { "xsi:type" => "tns1:Locale" },
                 :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
               }
             },
             :container_type => container_name,
-            :order! => [:cctx, :container_type],
-            :attributes! => {
-              :cobrand_context => { "xsi:type" => "tns1:CobrandContext" }
-            }
+            :order! => [:cctx, :container_type]
           }
         end
       end    
@@ -320,7 +336,8 @@ module Halberd
               :cobrand_conversation_credentials => {
                 :session_token => us.session_token,
               },
-              :order! => [:cobrand_id, :channel_id, :locale, :tnc_version, :application_id, :cobrand_conversation_credentials],
+              :preference_info => preferences,
+              :fetch_all_locale_data => false,
               :attributes! => {
                 :locale => { "xsi:type" => "tns1:Locale" },
                 :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
@@ -366,7 +383,8 @@ module Halberd
             :cobrand_conversation_credentials => {
               :session_token => us.session_token,
             },
-            :order! => [:cobrand_id, :channel_id, :locale, :tnc_version, :application_id, :cobrand_conversation_credentials],
+            :preference_info => preferences,
+            :fetch_all_locale_data => false,
             :attributes! => {
               :locale => { "xsi:type" => "tns1:Locale" },
               :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
@@ -418,7 +436,8 @@ module Halberd
             :cobrand_conversation_credentials => {
               :session_token => us.session_token,
             },
-            :order! => [:cobrand_id, :channel_id, :locale, :tnc_version, :application_id, :cobrand_conversation_credentials],
+            :preference_info => preferences,
+            :fetch_all_locale_data => false,
             :attributes! => {
               :locale => { "xsi:type" => "tns1:Locale" },
               :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
@@ -507,13 +526,17 @@ module Halberd
       end 
 
       def prefs
-        prefs = OrderedHash.new
-
-        prefs['currencyCode'] = 'USD'
-        prefs['timeZone'] = 'CST'
-        prefs['dateFormat'] = 'MM/dd/yyyy'
-        prefs['currencyNotationType'] = 'SYMBOL_NOTATION'
-        prefs
+        {
+         :currency_code => "USD",
+         :time_zone => "CST",
+         :date_format => "MM/dd/yyyy",
+         :currency_notation_type => "SYMBOL_NOTATION", 
+         :number_format => {
+           :decimal_separator => ".",
+           :grouping_separator => ",", 
+           :group_pattern => "###,##0.##"
+         }
+        }
       end
 
       def get_item_summary_for_item(item_id)
@@ -534,14 +557,12 @@ module Halberd
                 :session_token => us.session_token,
               },
               :preference_info => prefs,
+              :fetch_all_locale_data => false,
               :conversation_credentials => {
                 :session_token => you.session_token 
               },
               :valid => true,
               :is_password_expired => false,
-              :order! => [:cobrand_id, :channel_id, :locale, :tnc_version, :application_id, 
-                          :cobrand_conversation_credentials, :preference_info, 
-                          :conversation_credentials, :valid, :is_password_expired],
               :attributes! => {
                 :locale => { "xsi:type" => "collections:Locale" },
                 :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
@@ -575,14 +596,12 @@ module Halberd
                 :session_token => us.session_token,
               },
               :preference_info => prefs,
+              :fetch_all_locale_data => false,
               :conversation_credentials => {
                 :session_token => you.session_token 
               },
               :valid => true,
               :is_password_expired => false,
-              :order! => [:cobrand_id, :channel_id, :locale, :tnc_version, :application_id, 
-                          :cobrand_conversation_credentials, :preference_info, 
-                          :conversation_credentials, :valid, :is_password_expired],
               :attributes! => {
                 :locale => { "xsi:type" => "collections:Locale" },
                 :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
@@ -590,6 +609,7 @@ module Halberd
               }
             },
             :req => {
+                     :global_criteria => nil,
                      :containerCriteria => {:elements => [{:container_type => "bank",
                                                            :data_extent => {:start_level => 0, :end_level => 4}
                                                           },
@@ -623,7 +643,9 @@ module Halberd
                      :data_service_lite => false,
                      :inactive_item_accounts_needed => false,
                      :include_is_historic_bill_needed => false,
-                     :include_shared_accounts => false,
+                     :include_shared_accounts => false, 
+                     :include_account_additional_info => false,
+                     :tax_account_search_criteria => nil,
                      :attributes! => { :containerCriteria => {"xsi:type" => "collections:List" }}
                     },
             :item_ids => {
@@ -655,14 +677,12 @@ module Halberd
                 :session_token => us.session_token,
               },
               :preference_info => prefs,
+              :fetch_all_locale_data => false,
               :conversation_credentials => {
                 :session_token => you.session_token 
               },
               :valid => true,
               :is_password_expired => false,
-              :order! => [:cobrand_id, :channel_id, :locale, :tnc_version, :application_id, 
-                          :cobrand_conversation_credentials, :preference_info, 
-                          :conversation_credentials, :valid, :is_password_expired],
               :attributes! => {
                 :locale => { "xsi:type" => "collections:Locale" },
                 :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
@@ -721,14 +741,12 @@ module Halberd
                 :session_token => us.session_token,
               },
               :preference_info => prefs,
+              :fetch_all_locale_data => false,
               :conversation_credentials => {
                 :session_token => you.session_token 
               },
               :valid => true,
               :is_password_expired => false,
-              :order! => [:cobrand_id, :channel_id, :locale, :tnc_version, :application_id, 
-                          :cobrand_conversation_credentials, :preference_info, 
-                          :conversation_credentials, :valid, :is_password_expired],
               :attributes! => {
                 :locale => { "xsi:type" => "collections:Locale" },
                 :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
@@ -763,14 +781,12 @@ module Halberd
                 :session_token => us.session_token,
               },
               :preference_info => prefs,
+              :fetch_all_locale_data => false,
               :conversation_credentials => {
                 :session_token => you.session_token 
               },
               :valid => true,
               :is_password_expired => false,
-              :order! => [:cobrand_id, :channel_id, :locale, :tnc_version, :application_id, 
-                          :cobrand_conversation_credentials, :preference_info, 
-                          :conversation_credentials, :valid, :is_password_expired],
               :attributes! => {
                 :locale => { "xsi:type" => "collections:Locale" },
                 :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
@@ -804,14 +820,12 @@ module Halberd
                 :session_token => us.session_token,
               },
               :preference_info => prefs,
+              :fetch_all_locale_data => false,
               :conversation_credentials => {
                 :session_token => you.session_token 
               },
               :valid => true,
               :is_password_expired => false,
-              :order! => [:cobrand_id, :channel_id, :locale, :tnc_version, :application_id, 
-                          :cobrand_conversation_credentials, :preference_info, 
-                          :conversation_credentials, :valid, :is_password_expired],
               :attributes! => {
                 :locale => { "xsi:type" => "collections:Locale" },
                 :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
@@ -851,14 +865,12 @@ module Halberd
                 :session_token => us.session_token,
               },
               :preference_info => prefs,
+              :fetch_all_locale_data => false,
               :conversation_credentials => {
                 :session_token => you.session_token 
               },
               :valid => true,
               :is_password_expired => false,
-              :order! => [:cobrand_id, :channel_id, :locale, :tnc_version, :application_id, 
-                          :cobrand_conversation_credentials, :preference_info, 
-                          :conversation_credentials, :valid, :is_password_expired],
               :attributes! => {
                 :locale => { "xsi:type" => "collections:Locale" },
                 :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
@@ -896,14 +908,12 @@ module Halberd
                 :session_token => us.session_token,
               },
               :preference_info => prefs,
+              :fetch_all_locale_data => false,
               :conversation_credentials => {
                 :session_token => you.session_token 
               },
               :valid => true,
               :is_password_expired => false,
-              :order! => [:cobrand_id, :channel_id, :locale, :tnc_version, :application_id, 
-                          :cobrand_conversation_credentials, :preference_info, 
-                          :conversation_credentials, :valid, :is_password_expired],
               :attributes! => {
                 :locale => { "xsi:type" => "collections:Locale" },
                 :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
@@ -939,12 +949,12 @@ module Halberd
                 :session_token => us.session_token
               },
               :preference_info => prefs,
+              :fetch_all_locale_data => false,
               :conversation_credentials => {
                 :session_token => you.session_token 
               },
               :valid => true,
               :is_password_expired => false,
-              :order! => [:cobrand_id, :channel_id, :locale, :tnc_version, :application_id, :cobrand_conversation_credentials, :preference_info, :conversation_credentials, :valid, :is_password_expired],
               :attributes! => {
                 :locale => { "xsi:type" => "collections:Locale" },
                 :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
@@ -979,12 +989,12 @@ module Halberd
                 :session_token => us.session_token
               },
               :preference_info => prefs,
+              :fetch_all_locale_data => false,
               :conversation_credentials => {
                 :session_token => you.session_token 
               },
               :valid => true,
               :is_password_expired => false,
-              :order! => [:cobrand_id, :channel_id, :locale, :tnc_version, :application_id, :cobrand_conversation_credentials, :preference_info, :conversation_credentials, :valid, :is_password_expired],
               :attributes! => {
                 :locale => { "xsi:type" => "collections:Locale" },
                 :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
@@ -1019,12 +1029,12 @@ module Halberd
                 :session_token => us.session_token
               },
               :preference_info => prefs,
+              :fetch_all_locale_data => false,
               :conversation_credentials => {
                 :session_token => you.session_token 
               },
               :valid => true,
               :is_password_expired => false,
-              :order! => [:cobrand_id, :channel_id, :locale, :tnc_version, :application_id, :cobrand_conversation_credentials, :preference_info, :conversation_credentials, :valid, :is_password_expired],
               :attributes! => {
                 :locale => { "xsi:type" => "collections:Locale" },
                 :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
@@ -1059,12 +1069,12 @@ module Halberd
                 :session_token => us.session_token
               },
               :preference_info => prefs,
+              :fetch_all_locale_data => false,
               :conversation_credentials => {
                 :session_token => you.session_token 
               },
               :valid => true,
               :is_password_expired => false,
-              :order! => [:cobrand_id, :channel_id, :locale, :tnc_version, :application_id, :cobrand_conversation_credentials, :preference_info, :conversation_credentials, :valid, :is_password_expired],
               :attributes! => {
                 :locale => { "xsi:type" => "collections:Locale" },
                 :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
@@ -1111,14 +1121,12 @@ module Halberd
                 :session_token => us.session_token,
               },
               :preference_info => prefs,
+              :fetch_all_locale_data => false,
               :conversation_credentials => {
                 :session_token => you.session_token 
               },
               :valid => true,
               :is_password_expired => false,
-              :order! => [:cobrand_id, :channel_id, :locale, :tnc_version, :application_id, 
-                          :cobrand_conversation_credentials, :preference_info, 
-                          :conversation_credentials, :valid, :is_password_expired],
               :attributes! => {
                 :locale => { "xsi:type" => "collections:Locale" },
                 :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
@@ -1170,14 +1178,12 @@ module Halberd
                 :session_token => us.session_token,
               },
               :preference_info => prefs,
+              :fetch_all_locale_data => false,
               :conversation_credentials => {
                 :session_token => you.session_token 
               },
               :valid => true,
               :is_password_expired => false,
-              :order! => [:cobrand_id, :channel_id, :locale, :tnc_version, :application_id, 
-                          :cobrand_conversation_credentials, :preference_info, 
-                          :conversation_credentials, :valid, :is_password_expired],
               :attributes! => {
                 :locale => { "xsi:type" => "collections:Locale" },
                 :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
@@ -1285,14 +1291,12 @@ module Halberd
                 :session_token => us.session_token,
               },
               :preference_info => prefs,
+              :fetch_all_locale_data => false,
               :conversation_credentials => {
                 :session_token => you.session_token 
               },
               :valid => true,
               :is_password_expired => false,
-              :order! => [:cobrand_id, :channel_id, :locale, :tnc_version, :application_id, 
-                          :cobrand_conversation_credentials, :preference_info, 
-                          :conversation_credentials, :valid, :is_password_expired],
               :attributes! => {
                 :locale => { "xsi:type" => "collections:Locale" },
                 :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
