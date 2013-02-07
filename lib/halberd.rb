@@ -5,7 +5,7 @@ require 'halberd/utils'
 Savon.configure do |config|
   config.soap_version = 2
   config.logger.level = :info
-  config.log = true
+  config.log = false
 end
 
 module Halberd 
@@ -64,7 +64,9 @@ module Halberd
       @cobrand_client ||= Savon::Client.new do
         wsdl.namespace = "http://cobrandlogin.login.core.soap.yodlee.com"
         wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/CobrandLoginService"
+
         http.auth.ssl.verify_mode = :none
+        http.auth.ssl.ssl_version = :TLSv1
       end
     end
   
@@ -73,6 +75,7 @@ module Halberd
         wsdl.namespace = "http://userregistration.usermanagement.core.soap.yodlee.com"
         wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/UserRegistrationService?wsdl"
         http.auth.ssl.verify_mode = :none
+        http.auth.ssl.ssl_version = :TLSv1
       end
     end
 
@@ -81,6 +84,7 @@ module Halberd
         wsdl.namespace = "http://login.login.core.soap.yodlee.com"
         wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/LoginService?wsdl"
         http.auth.ssl.verify_mode = :none
+        http.auth.ssl.ssl_version = :TLSv1
       end
     end
  
@@ -89,6 +93,7 @@ module Halberd
         wsdl.namespace = "http://itemmanagement.accountmanagement.core.soap.yodlee.com"
         wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/ItemManagementService"
         http.auth.ssl.verify_mode = :none
+        http.auth.ssl.ssl_version = :TLSv1
       end
     end
 
@@ -97,6 +102,7 @@ module Halberd
         wsdl.namespace = "http://refresh.refresh.core.soap.yodlee.com"
         wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/RefreshService?wsdl"
         http.auth.ssl.verify_mode = :none
+        http.auth.ssl.ssl_version = :TLSv1
       end
     end
    
@@ -105,6 +111,7 @@ module Halberd
         wsdl.namespace = "http://dataservice.dataservice.core.soap.yodlee.com"
         wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/DataService?wsdl"
         http.auth.ssl.verify_mode = :none
+        http.auth.ssl.ssl_version = :TLSv1
       end
     end
 
@@ -113,6 +120,7 @@ module Halberd
         wsdl.namespace = "http://contentservicetraversal.traversal.ext.soap.yodlee.com"
         wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/ContentServiceTraversalService"
         http.auth.ssl.verify_mode = :none
+        http.auth.ssl.ssl_version = :TLSv1
       end
     end
     
@@ -121,6 +129,7 @@ module Halberd
         wsdl.namespace = "http://transactioncategorizationservice.transactioncategorization.core.soap.yodlee.com"
         wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/TransactionCategorizationService"
         http.auth.ssl.verify_mode = :none
+        http.auth.ssl.ssl_version = :TLSv1
       end
     end
 
@@ -129,6 +138,7 @@ module Halberd
         wsdl.namespace = "http://instantverificationdataservice.verification.core.soap.yodlee.com"
         wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/InstantVerificationDataService"
         http.auth.ssl.verify_mode = :none
+        http.auth.ssl.ssl_version = :TLSv1
       end
     end
   end
