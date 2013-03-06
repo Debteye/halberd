@@ -141,7 +141,19 @@ module Halberd
         http.auth.ssl.ssl_version = :TLSv1
       end
     end
+
+    def routing_number_client
+      @routing_number_client ||= Savon::Client.new do
+        wsdl.namespace = "http://routingnumberservice.routingnumberservice.core.soap.yodlee.com"
+        wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/RoutingNumberService"
+        http.auth.ssl.verify_mode = :none
+        http.auth.ssl.ssl_version = :TLSv1
+      end
+    end
+
   end
+
+  
 
   class Us
     include Config
@@ -239,6 +251,34 @@ module Halberd
         end
       end
 
+      def get_all_routing_number_infos
+        @all_ervice_list ||= routing_number_client.request :sl, :get_all_routing_number_infos do
+          soap.element_form_default = :unqualified
+          soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
+          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
+          soap.body = {
+            :cobrandContext => {
+              :cobrand_id      => credentials.cobrand_id,
+              :channel_id      => us.channel_id,
+              :locale          => credentials.locale,
+              :tnc_version     => credentials.tnc_version,
+              :application_id  => credentials.application_id,
+              :cobrand_conversation_credentials => {
+                :session_token => us.session_token,
+              },
+              :preference_info => preferences,
+              :fetch_all_locale_data => false,
+              :attributes! => {
+                :locale => { "xsi:type" => "tns1:Locale" },
+                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
+              }
+            },
+            :attributes! => {
+              :cobrand_context => { "xsi:type" => "tns1:CobrandContext" }
+            }
+          }
+        end
+      end
 
       def get_category_list
         @category_list = category_client.request :sl, :get_supported_transaction_categrories do
