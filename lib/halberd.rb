@@ -1239,9 +1239,10 @@ module Halberd
                 :elements => { "xsi:type" => "common:FieldInfoSingle" },
               }
             },
+            :search_filter => {},
             :routing_number => routing_number,
             :account_number => account_number,
-            :order! => [:user_context, :content_service_id, :credential_fields, :routing_number, :account_number],
+            :order! => [:user_context, :search_filter, :content_service_id, :credential_fields, :routing_number, :account_number],
             :attributes! => {
               :user_context => { "xsi:type" => "common:UserContext" },
             }
