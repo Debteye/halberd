@@ -1145,6 +1145,7 @@ module Halberd
         item_verification
       end
 
+      #may not be needed
       def get_matching_account_verification_data!(account_id)
         @matching_account_verification_response = instant_verification_client.request :sl, :get_matching_account_verification_data do
           soap.element_form_default = :unqualified
