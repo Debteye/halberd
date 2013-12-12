@@ -1194,7 +1194,7 @@ module Halberd
         register_response.to_hash[:get_matching_account_verification_data_response][:get_matching_account_verification_data_return]
       end
 
-      def instant_account_verification_register!(content_service_id, routing_number, account_number, opts = {})
+      def instant_account_verification_register!(content_service_id, routing_number, opts = {})
         user_credentials = opts[:credentials]
                    
         user_credentials && user_credentials.map! do |credential|
@@ -1239,10 +1239,10 @@ module Halberd
                 :elements => { "xsi:type" => "common:FieldInfoSingle" },
               }
             },
-            :search_filter => {},
-            :routing_number => routing_number,
-            :account_number => account_number,
-            :order! => [:user_context, :search_filter, :content_service_id, :credential_fields, :routing_number, :account_number],
+            :search_filter => {
+              :routing_number => routing_number
+            },
+            :order! => [:user_context, :search_filter, :content_service_id, :credential_fields],
             :attributes! => {
               :user_context => { "xsi:type" => "common:UserContext" },
             }
