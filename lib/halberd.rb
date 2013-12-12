@@ -1145,17 +1145,8 @@ module Halberd
         item_verification
       end
 
-      def instant_account_verification_register!(content_service_id, routing_number, account_number, opts = {})
-        user_credentials = opts[:credentials]
-                   
-        user_credentials && user_credentials.map! do |credential|
-          CREDENTIAL_ORDER.inject({}) do |hsh, key|
-            hsh[CREDENTIAL_CONVERT[key] || key] = credential[key]
-            hsh
-          end
-        end
-
-        @register_response = instant_verification_client.request :sl, :add_item_and_start_verification_data_request1 do
+      def get_matching_account_verification_data!(account_id)
+        @matching_account_verification_response = instant_verification_client.request :sl, :get_matching_account_verification_data do
           soap.element_form_default = :unqualified
           soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
           soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
@@ -1183,25 +1174,14 @@ module Halberd
                 :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
               }
             },
-            :content_service_id => content_service_id,
-            :routing_number => routing_number,
-            :account_number => account_number,
-            :credential_fields => {
-              :elements => user_credentials,
-              :attributes! => {
-                :elements => { "xsi:type" => "common:FieldInfoSingle" },
-              }
-            },
-            :order! => [:user_context, :credential_fields, :content_service_id, :routing_number, :account_number],
-            :attributes! => {
-              :user_context => { "xsi:type" => "common:UserContext" },
-            }
+            :verifiable_account => {
+              :account_id => account_id
+            }            
           }
-          
         end
 
-        @items << register_response.to_hash[:add_item_and_start_verification_data_request1_response][:add_item_and_start_verification_data_request1_return]
-        register_response.to_hash[:add_item_and_start_verification_data_request1_response][:add_item_and_start_verification_data_request1_return]
+        @items << register_response.to_hash[:get_matching_account_verification_data_response][:get_matching_account_verification_data_return]
+        register_response.to_hash[:get_matching_account_verification_data_response][:get_matching_account_verification_data_return]
       end
 
       def update_credentials(item_id, opts = {})
