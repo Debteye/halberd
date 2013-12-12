@@ -1184,7 +1184,7 @@ module Halberd
         register_response.to_hash[:get_matching_account_verification_data_response][:get_matching_account_verification_data_return]
       end
 
-      def instant_account_verification_register!(content_service_id, routing_number, account_number, opts = {})
+      def instant_account_verification_register!(content_service_id, opts = {})
         user_credentials = opts[:credentials]
                    
         user_credentials && user_credentials.map! do |credential|
