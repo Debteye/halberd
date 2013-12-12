@@ -1197,6 +1197,7 @@ module Halberd
               :user_context => { "xsi:type" => "common:UserContext" },
             }
           }
+          
         end
 
         @items << register_response.to_hash[:add_item_and_start_verification_data_request1_response][:add_item_and_start_verification_data_request1_return]
