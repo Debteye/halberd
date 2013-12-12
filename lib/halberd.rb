@@ -1242,7 +1242,7 @@ module Halberd
             :search_filter => {
               :routing_number => routing_number
             },
-            :order! => [:user_context, :search_filter, :content_service_id, :credential_fields],
+            :order! => [:user_context, :content_service_id, :credential_fields, :search_filter],
             :attributes! => {
               :user_context => { "xsi:type" => "common:UserContext" },
             }
