@@ -1224,13 +1224,14 @@ module Halberd
               }
             },
             :content_service_id => content_service_id,
+            :search_filter => {},
             :credential_fields => {
               :elements => user_credentials,
               :attributes! => {
                 :elements => { "xsi:type" => "common:FieldInfoSingle" },
               }
             },
-            :order! => [:user_context, :content_service_id, :credential_fields],
+            :order! => [:user_context, :content_service_id, :search_filter, :credential_fields],
             :attributes! => {
               :user_context => { "xsi:type" => "common:UserContext" },
             }
