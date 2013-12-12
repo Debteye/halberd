@@ -1231,7 +1231,7 @@ module Halberd
                 :elements => { "xsi:type" => "common:FieldInfoSingle" },
               }
             },
-            :order! => [:user_context, :content_service_id, :search_filter, :credential_fields],
+            :order! => [:user_context, :content_service_id, :credential_fields, :search_filter],
             :attributes! => {
               :user_context => { "xsi:type" => "common:UserContext" },
             }
