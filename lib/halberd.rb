@@ -1145,7 +1145,7 @@ module Halberd
         item_verification
       end
 
-      def instant_account_verification_register!(content_service_id, routing_number, account_number)
+      def instant_account_verification_register!(content_service_id, routing_number, account_number, opts = {})
         user_credentials = opts[:credentials]
                    
         user_credentials && user_credentials.map! do |credential|
