@@ -1204,6 +1204,8 @@ module Halberd
           end
         end
 
+        raise user_credentials.inspect
+
         @register_response = extended_instant_verification_client.request :sl, :add_item_and_start_verification_data_request do
           soap.element_form_default = :unqualified
           soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
@@ -1247,8 +1249,8 @@ module Halberd
           }
         end
 
-        @items << register_response.to_hash[:add_item_and_start_verification_data_request1_response][:add_item_and_start_verification_data_request1_return]
-        register_response.to_hash[:add_item_and_start_verification_data_request1_response][:add_item_and_start_verification_data_request1_return]
+        @items << register_response.to_hash[:add_item_and_start_verification_data_request_response][:add_item_and_start_verification_data_request_return]
+        register_response.to_hash[:add_item_and_start_verification_data_request_response][:add_item_and_start_verification_data_request_return]
       end
 
       def update_credentials(item_id, opts = {})
