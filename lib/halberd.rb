@@ -1223,15 +1223,13 @@ module Halberd
               }
             },
             :content_service_id => content_service_id,
-            :routing_number => routing_number,
-            :account_number => account_number,
             :credential_fields => {
               :elements => user_credentials,
               :attributes! => {
                 :elements => { "xsi:type" => "common:FieldInfoSingle" },
               }
             },
-            :order! => [:user_context, :content_service_id, :credential_fields, :routing_number, :account_number],
+            :order! => [:user_context, :content_service_id, :credential_fields],
             :attributes! => {
               :user_context => { "xsi:type" => "common:UserContext" },
             }
