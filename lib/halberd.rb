@@ -1204,8 +1204,6 @@ module Halberd
           end
         end
 
-        raise user_credentials.inspect
-
         @register_response = extended_instant_verification_client.request :sl, :add_item_and_start_verification_data_request do
           soap.element_form_default = :unqualified
           soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
