@@ -638,7 +638,7 @@ module Halberd
       end
 
       def get_instant_account_verification_item!(item_id, opts = {})
-        @item = extended_instant_verification_client.request :sl, :get_item_verification_data do
+        @item = instant_verification_client.request :sl, :get_item_verification_data do
           soap.element_form_default = :unqualified
           soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
           soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
