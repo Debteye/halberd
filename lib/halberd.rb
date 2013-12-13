@@ -689,7 +689,7 @@ module Halberd
           }
         end
 
-        update_response
+        update_response.to_hash[:update_item_credentials_and_start_verification_data_request_response][:update_item_credentials_and_start_verification_data_request_return]
       end
 
       def get_instant_account_verification_item!(item_id, opts = {})
@@ -732,8 +732,8 @@ module Halberd
             }
           }
         end
-
-        return_items
+        
+        return_items.to_hash[:get_item_verification_data_response][:get_item_verification_data_return][:elements]
       end
 
       def register_instant_account_verification!(content_service_id, routing_number, opts = {})
@@ -788,8 +788,7 @@ module Halberd
             }
           }
         end
-
-        @items << register_response.to_hash[:add_item_and_start_verification_data_request_response][:add_item_and_start_verification_data_request_return]
+        
         register_response.to_hash[:add_item_and_start_verification_data_request_response][:add_item_and_start_verification_data_request_return]
       end
 
