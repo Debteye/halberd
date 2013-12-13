@@ -638,6 +638,8 @@ module Halberd
       end
 
       def get_instant_account_verification_item!(item_id, opts = {})
+        iav_items = [item_id]
+
         @item = instant_verification_client.request :sl, :get_item_verification_data do
           soap.element_form_default = :unqualified
           soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
@@ -666,7 +668,9 @@ module Halberd
                 :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
               }
             },
-            :item_ids => [item_id],          
+            :item_ids => {
+              :elements => iav_items 
+            },      
             :order! => [:user_context, :item_ids],
             :attributes! => {
               :user_context => { "xsi:type" => "common:UserContext"}
