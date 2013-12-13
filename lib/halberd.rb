@@ -647,7 +647,7 @@ module Halberd
           end
         end
 
-        update_response = extended_instant_verification_client.request :sl, :add_item_and_start_verification_data_request do
+        update_response = extended_instant_verification_client.request :sl, :update_item_credentials_and_start_verification_data_request do
           soap.element_form_default = :unqualified
           soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
           soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
