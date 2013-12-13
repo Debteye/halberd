@@ -678,7 +678,7 @@ module Halberd
           }
         end
 
-        return_items.to_hash[:get_item_verification_data_request_response][:get_item_verification_data_request_return]
+        return_items
       end
 
       def register_instant_account_verification!(content_service_id, routing_number, opts = {})
