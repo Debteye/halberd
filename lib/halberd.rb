@@ -143,7 +143,7 @@ module Halberd
     end
 
     def extended_instant_verification_client
-      @instant_verification_client ||= Savon::Client.new do
+      @extended_instant_verification_client ||= Savon::Client.new do
         wsdl.namespace = "http://extendedinstantverificationdataservice.verification.core.soap.yodlee.com"
         wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/ExtendedInstantVerificationDataService"
         http.auth.ssl.verify_mode = :none
@@ -695,7 +695,7 @@ module Halberd
       def get_instant_account_verification_item!(item_id, opts = {})
         iav_items = [item_id]
 
-        return_items = extended_instant_verification_client.request :sl, :get_item_verification_data do
+        return_items = instant_verification_client.request :sl, :get_item_verification_data do
           soap.element_form_default = :unqualified
           soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
           soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
