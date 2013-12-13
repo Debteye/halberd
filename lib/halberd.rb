@@ -637,7 +637,7 @@ module Halberd
         end
       end
 
-      def update_item_credentials_and_start_verification_data(item_id, opts = {})
+      def update_item_credentials_and_start_verification_data!(item_id, opts = {})
         user_credentials = opts[:credentials]
                    
         user_credentials && user_credentials.map! do |credential|
@@ -682,7 +682,7 @@ module Halberd
                 :elements => { "xsi:type" => "common:FieldInfoSingle" },
               }
             },                    
-            :order! => [:user_context, :credential_fields, :item_id],
+            :order! => [:user_context, :item_id, :credential_fields],
             :attributes! => {
               :user_context => { "xsi:type" => "common:UserContext" },
             }
