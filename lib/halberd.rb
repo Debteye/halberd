@@ -1,12 +1,6 @@
-require 'savon_model'
+require 'savon'
 require 'orderedhash'
 require 'halberd/utils'
-
-Savon.configure do |config|
-  config.soap_version = 2
-  config.logger.level = :info
-  config.log = false
-end
 
 module Halberd 
   
@@ -19,6 +13,16 @@ module Halberd
   end
 
   module Config 
+    def client_opts
+      @client_opts ||= {
+        soap_version: 2, 
+        log_level: :info,
+        log: false, 
+        ssl_verify_mode: :none,
+        ssl_version: :TLSv1
+      }
+    end
+
     def config
       config_location = "config/halberd.yml"
       config_location = Rails.root.join(config_location) if defined?(Rails) 
@@ -61,93 +65,121 @@ module Halberd
     end 
 
     def cobrand_client
-      @cobrand_client ||= Savon::Client.new do
-        wsdl.namespace = "http://cobrandlogin.login.core.soap.yodlee.com"
-        wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/CobrandLoginService"
-
-        http.auth.ssl.verify_mode = :none
-        http.auth.ssl.ssl_version = :TLSv1
+      url = "#{yodlee_location}/yodsoap/services/CobrandLoginService?wsdl"
+      Savon.client(client_opts) do
+        endpoint url
+        namespace "http://cobrandlogin.login.core.soap.yodlee.com"
+        namespaces('xmlns:login' => "http://login.ext.soap.yodlee.com",
+                   'xmlns:tns1' => "http://collections.soap.yodlee.com")
       end
     end
   
     def registration_client
-      @registration_client ||= Savon::Client.new do
-        wsdl.namespace = "http://userregistration.usermanagement.core.soap.yodlee.com"
-        wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/UserRegistrationService?wsdl"
-        http.auth.ssl.verify_mode = :none
-        http.auth.ssl.ssl_version = :TLSv1
+      url = "#{yodlee_location}/yodsoap/services/UserRegistrationService?wsdl"
+      Savon.client(client_opts) do
+        namespace "http://userregistration.usermanagement.core.soap.yodlee.com"
+        endpoint url
+        namespaces('xmlns:login' => "http://login.ext.soap.yodlee.com",
+                   'xmlns:common' => "http://common.soap.yodlee.com",
+                   'xmlns:tns1' => "http://collections.soap.yodlee.com")
+
       end
     end
 
     def login_client
-      @login_client ||= Savon::Client.new do
-        wsdl.namespace = "http://login.login.core.soap.yodlee.com"
-        wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/LoginService?wsdl"
-        http.auth.ssl.verify_mode = :none
-        http.auth.ssl.ssl_version = :TLSv1
+      url = "#{yodlee_location}/yodsoap/services/LoginService?wsdl"
+      Savon.client(client_opts) do
+        namespace "http://login.login.core.soap.yodlee.com"
+        endpoint url
+        namespaces('xmlns:login' => "http://login.ext.soap.yodlee.com",
+                   'xmlns:common' => "http://common.soap.yodlee.com",
+                   'xmlns:tns1' => "http://collections.soap.yodlee.com")
+
       end
     end
  
     def item_client
-      @item_client ||= Savon::Client.new do
-        wsdl.namespace = "http://itemmanagement.accountmanagement.core.soap.yodlee.com"
-        wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/ItemManagementService"
-        http.auth.ssl.verify_mode = :none
-        http.auth.ssl.ssl_version = :TLSv1
+      url = "#{yodlee_location}/yodsoap/services/ItemManagementService"
+      Savon.client(client_opts) do
+        namespace "http://itemmanagement.accountmanagement.core.soap.yodlee.com"
+        endpoint url
+        namespaces('xmlns:login' => "http://login.ext.soap.yodlee.com",
+                   'xmlns:common' => "http://common.soap.yodlee.com",
+                   'xmlns:tns1' => "http://collections.soap.yodlee.com")
+
       end
     end
 
     def refresh_client
-      @refresh_client ||= Savon::Client.new do
-        wsdl.namespace = "http://refresh.refresh.core.soap.yodlee.com"
-        wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/RefreshService?wsdl"
-        http.auth.ssl.verify_mode = :none
-        http.auth.ssl.ssl_version = :TLSv1
+      url = "#{yodlee_location}/yodsoap/services/RefreshService?wsdl"
+      Savon.client(client_opts) do
+        namespace "http://refresh.refresh.core.soap.yodlee.com"
+        endpoint url
+        namespaces('xmlns:login' => "http://login.ext.soap.yodlee.com",
+                   'xmlns:mfarefresh' => 'http://mfarefresh.core.soap.yodlee.com',
+                   'xmlns:mfacollections' => 'http://mfarefresh.core.collection.soap.yodlee.com',
+                   'xmlns:common' => "http://common.soap.yodlee.com",
+                   'xmlns:tns1' => "http://collections.soap.yodlee.com")
+
       end
     end
    
     def dataservice_client
-      @dataservice_client ||= Savon::Client.new do
-        wsdl.namespace = "http://dataservice.dataservice.core.soap.yodlee.com"
-        wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/DataService?wsdl"
-        http.auth.ssl.verify_mode = :none
-        http.auth.ssl.ssl_version = :TLSv1
+      url = "#{yodlee_location}/yodsoap/services/DataService?wsdl"
+      Savon.client(client_opts) do
+        namespace "http://dataservice.dataservice.core.soap.yodlee.com"
+        endpoint url
+        namespaces('xmlns:login' => "http://login.ext.soap.yodlee.com",
+                   'xmlns:dataservice' => "http://dataservice.core.soap.yodlee.com",
+                   'xmlns:common' => "http://common.soap.yodlee.com",
+                   'xmlns:collections' => "http://collections.soap.yodlee.com",
+                   'xmlns:tns1' => "http://collections.soap.yodlee.com")
+
       end
     end
 
     def content_traversal_client
-      @content_traversal_client ||= Savon::Client.new do
-        wsdl.namespace = "http://contentservicetraversal.traversal.ext.soap.yodlee.com"
-        wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/ContentServiceTraversalService"
-        http.auth.ssl.verify_mode = :none
-        http.auth.ssl.ssl_version = :TLSv1
+      url = "#{yodlee_location}/yodsoap/services/ContentServiceTraversalService"
+      Savon.client(client_opts) do
+        namespace "http://contentservicetraversal.traversal.ext.soap.yodlee.com"
+        endpoint url
+        namespaces('xmlns:tns1' => "http://collections.soap.yodlee.com",
+                   'xmlns:login' => 'http://login.ext.soap.yodlee.com')
       end
     end
     
     def category_client
-      @category_client ||= Savon::Client.new do
-        wsdl.namespace = "http://transactioncategorizationservice.transactioncategorization.core.soap.yodlee.com"
-        wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/TransactionCategorizationService"
-        http.auth.ssl.verify_mode = :none
-        http.auth.ssl.ssl_version = :TLSv1
+      url = "#{yodlee_location}/yodsoap/services/TransactionCategorizationService"
+      Savon.client(client_opts) do
+        namespace "http://transactioncategorizationservice.transactioncategorization.core.soap.yodlee.com"
+        endpoint url
+        namespaces('xmlns:login' => "http://login.ext.soap.yodlee.com",
+                   'xmlns:common' => "http://common.soap.yodlee.com",
+                   'xmlns:tns1' => "http://collections.soap.yodlee.com")
+
       end
     end
 
     def instant_verification_client
-      @instant_verification_client ||= Savon::Client.new do
-        wsdl.namespace = "http://instantverificationdataservice.verification.core.soap.yodlee.com"
-        wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/InstantVerificationDataService"
-        http.auth.ssl.verify_mode = :none
-        http.auth.ssl.ssl_version = :TLSv1
+      url = "#{yodlee_location}/yodsoap/services/InstantVerificationDataService"
+      Savon.client(client_opts) do
+        namespace "http://instantverificationdataservice.verification.core.soap.yodlee.com"
+        endpoint url
+        namespaces('xmlns:login' => "http://login.ext.soap.yodlee.com",
+                   'xmlns:common' => "http://common.soap.yodlee.com",
+                   'xmlns:tns1' => "http://collections.soap.yodlee.com")
+
       end
     end
 
     def routing_number_client
-      @routing_number_client ||= Savon::Client.new do
-        wsdl.namespace = "http://routingnumberservice.routingnumberservice.core.soap.yodlee.com"
-        wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/RoutingNumberService"
-        http.auth.ssl.verify_mode = :none
-        http.auth.ssl.ssl_version = :TLSv1
+      url = "#{yodlee_location}/yodsoap/services/RoutingNumberService"
+      Savon.client(client_opts) do
+        namespace "http://routingnumberservice.routingnumberservice.core.soap.yodlee.com"
+        endpoint url
+        namespaces('xmlns:login' => "http://login.ext.soap.yodlee.com",
+                   'xmlns:tns1' => "http://collections.soap.yodlee.com")
+
       end
     end
 
@@ -161,11 +193,7 @@ module Halberd
     attr_accessor :session, :response, :session_token, :channel_id, :timeout_time
 
     def connect!
-      @response = cobrand_client.request :cob, :login_cobrand do
-        soap.element_form_default = :unqualified
-        soap.namespaces['xmlns:login'] = "http://login.ext.soap.yodlee.com"
-        soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
-        soap.body = {
+       body = {
           :cobrand_id     => credentials.cobrand_id,
           :application_id => credentials.application_id,
           :locale         => credentials.locale,
@@ -183,8 +211,7 @@ module Halberd
             :locale => { "xsi:type" => "tns1:Locale" }
           }
         }
-      end
-
+      @response = cobrand_client.call :login_cobrand, message: body
       set_connected_status!
     end
     
@@ -223,183 +250,164 @@ module Halberd
       end
 
       def get_all_content_service_list
-        @all_ervice_list ||= content_traversal_client.request :sl, :get_content_services_by_container_type do
-          soap.element_form_default = :unqualified
-          soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
-          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
-          soap.body = {
-            :cobrandContext => {
-              :cobrand_id      => credentials.cobrand_id,
-              :channel_id      => us.channel_id,
-              :locale          => credentials.locale,
-              :tnc_version     => credentials.tnc_version,
-              :application_id  => credentials.application_id,
-              :cobrand_conversation_credentials => {
-                :session_token => us.session_token,
-              },
-              :preference_info => preferences,
-              :fetch_all_locale_data => false,
-              :attributes! => {
-                :locale => { "xsi:type" => "tns1:Locale" },
-                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
-              }
+          #soap.element_form_default = :unqualified
+        body = {
+          :cobrandContext => {
+            :cobrand_id      => credentials.cobrand_id,
+            :channel_id      => us.channel_id,
+            :locale          => credentials.locale,
+            :tnc_version     => credentials.tnc_version,
+            :application_id  => credentials.application_id,
+            :cobrand_conversation_credentials => {
+              :session_token => us.session_token,
             },
+            :preference_info => preferences,
+            :fetch_all_locale_data => false,
             :attributes! => {
-              :cobrand_context => { "xsi:type" => "tns1:CobrandContext" }
+              :locale => { "xsi:type" => "tns1:Locale" },
+              :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
             }
+          },
+          :attributes! => {
+            :cobrand_context => { "xsi:type" => "tns1:CobrandContext" }
           }
-        end
+        }
+        @all_ervice_list ||= content_traversal_client.call :get_content_services_by_container_type, message: body 
       end
 
       def get_all_routing_number_infos
-        @all_ervice_list ||= routing_number_client.request :sl, :get_all_routing_number_infos do
-          soap.element_form_default = :unqualified
-          soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
-          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
-          soap.body = {
-            :cobrandContext => {
-              :cobrand_id      => credentials.cobrand_id,
-              :channel_id      => us.channel_id,
-              :locale          => credentials.locale,
-              :tnc_version     => credentials.tnc_version,
-              :application_id  => credentials.application_id,
-              :cobrand_conversation_credentials => {
-                :session_token => us.session_token,
-              },
-              :preference_info => preferences,
-              :fetch_all_locale_data => false,
-              :attributes! => {
-                :locale => { "xsi:type" => "tns1:Locale" },
-                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
-              }
+          #soap.element_form_default = :unqualified
+        body = {
+          :cobrandContext => {
+            :cobrand_id      => credentials.cobrand_id,
+            :channel_id      => us.channel_id,
+            :locale          => credentials.locale,
+            :tnc_version     => credentials.tnc_version,
+            :application_id  => credentials.application_id,
+            :cobrand_conversation_credentials => {
+              :session_token => us.session_token,
             },
+            :preference_info => preferences,
+            :fetch_all_locale_data => false,
             :attributes! => {
-              :cobrand_context => { "xsi:type" => "tns1:CobrandContext" }
+              :locale => { "xsi:type" => "tns1:Locale" },
+              :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
             }
+          },
+          :attributes! => {
+            :cobrand_context => { "xsi:type" => "tns1:CobrandContext" }
           }
-        end
+        }
+        @all_ervice_list ||= routing_number_client.call :get_all_routing_number_infos, message: body
       end
 
       def get_category_list
-        @category_list = category_client.request :sl, :get_supported_transaction_categrories do
-          soap.element_form_default = :unqualified
-          soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
-          soap.namespaces['xmlns:tns2'] = "http://common.soap.yodlee.com"
-          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
-          soap.body = {
-            :cobrand_context => {
-              :cobrand_id      => credentials.cobrand_id,
-              :channel_id      => us.channel_id,
-              :locale          => credentials.locale,
-              :tnc_version     => credentials.tnc_version,
-              :application_id  => credentials.application_id,
-              :cobrand_conversation_credentials => {
-                :session_token => us.session_token,
-              },
-              :preference_info => preferences,
-              :fetch_all_locale_data => false,
-              :attributes! => {
-                :locale => { "xsi:type" => "tns1:Locale" },
-                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
-              } 
+        #  soap.element_form_default = :unqualified
+        body = {
+          :cobrand_context => {
+            :cobrand_id      => credentials.cobrand_id,
+            :channel_id      => us.channel_id,
+            :locale          => credentials.locale,
+            :tnc_version     => credentials.tnc_version,
+            :application_id  => credentials.application_id,
+            :cobrand_conversation_credentials => {
+              :session_token => us.session_token,
             },
-            :order! => [:cobrand_context],
+            :preference_info => preferences,
+            :fetch_all_locale_data => false,
             :attributes! => {
-              :cobrand_context => { "xsi:type" => "tns2:CobrandContext" }
+              :locale => { "xsi:type" => "tns1:Locale" },
+              :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
             } 
+          },
+          :order! => [:cobrand_context],
+          :attributes! => {
+            :cobrand_context => { "xsi:type" => "tns2:CobrandContext" }
           } 
-        end
+        } 
+        @category_list = category_client.call :get_supported_transaction_categrories, message: body
       end
 
       def get_content_service_info(content_service_id)
-        @service_list ||= content_traversal_client.request :sl, :get_content_service_info1 do
-          soap.element_form_default = :unqualified
-          soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
-          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
-          soap.body = {
-            :cctx => {
-              :cobrand_id      => credentials.cobrand_id,
-              :channel_id      => us.channel_id,
-              :locale          => credentials.locale,
-              :tnc_version     => credentials.tnc_version,
-              :application_id  => credentials.application_id,
-              :cobrand_conversation_credentials => {
-                :session_token => us.session_token,
-              },
-              :preference_info => preferences,
-              :fetch_all_locale_data => false,
-              :attributes! => {
-                :locale => { "xsi:type" => "tns1:Locale" },
-                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
-              }
+        #  soap.element_form_default = :unqualified
+        body = {
+          :cctx => {
+            :cobrand_id      => credentials.cobrand_id,
+            :channel_id      => us.channel_id,
+            :locale          => credentials.locale,
+            :tnc_version     => credentials.tnc_version,
+            :application_id  => credentials.application_id,
+            :cobrand_conversation_credentials => {
+              :session_token => us.session_token,
             },
-            :content_service_id => content_service_id,
-            :req_specifier => (16 | 2 | 1 | 128),
-            :order! => [:cctx, :content_service_id, :req_specifier],
+            :preference_info => preferences,
+            :fetch_all_locale_data => false,
             :attributes! => {
-              :cobrand_context => { "xsi:type" => "tns1:CobrandContext" }
+              :locale => { "xsi:type" => "tns1:Locale" },
+              :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
             }
+          },
+          :content_service_id => content_service_id,
+          :req_specifier => (16 | 2 | 1 | 128),
+          :order! => [:cctx, :content_service_id, :req_specifier],
+          :attributes! => {
+            :cobrand_context => { "xsi:type" => "tns1:CobrandContext" }
           }
-        end
+        }
+        @service_list ||= content_traversal_client.call :get_content_service_info1, message: body
       end    
 
       def get_service_list(container_name)
-        @service_list ||= content_traversal_client.request :sl, :get_content_services_by_container_type2 do
-          soap.element_form_default = :unqualified
-          soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
-          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
-          soap.body = {
-            :cctx => {
-              :cobrand_id      => credentials.cobrand_id,
-              :channel_id      => us.channel_id,
-              :locale          => credentials.locale,
-              :tnc_version     => credentials.tnc_version,
-              :application_id  => credentials.application_id,
-              :cobrand_conversation_credentials => {
-                :session_token => us.session_token,
-              },
-              :preference_info => preferences,
-              :fetch_all_locale_data => false,
-              :attributes! => {
-                :locale => { "xsi:type" => "tns1:Locale" },
-                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
-              }
+        #  soap.element_form_default = :unqualified
+        body = {
+          :cctx => {
+            :cobrand_id      => credentials.cobrand_id,
+            :channel_id      => us.channel_id,
+            :locale          => credentials.locale,
+            :tnc_version     => credentials.tnc_version,
+            :application_id  => credentials.application_id,
+            :cobrand_conversation_credentials => {
+              :session_token => us.session_token,
             },
-            :container_type => container_name,
-            :order! => [:cctx, :container_type]
-          }
-        end
+            :preference_info => preferences,
+            :fetch_all_locale_data => false,
+            :attributes! => {
+              :locale => { "xsi:type" => "tns1:Locale" },
+              :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
+            }
+          },
+          :container_type => container_name,
+          :order! => [:cctx, :container_type]
+        }
+        @service_list ||= content_traversal_client.call :get_content_services_by_container_type2, message: body
       end    
 
       def get_login_form(content_service_id)
-        login_form_response = item_client.request :sl, :get_login_form_for_content_service do
-          soap.element_form_default = :unqualified
-          soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
-          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
-          soap.body = {
-            :cobrand_context => {
-              :cobrand_id      => credentials.cobrand_id,
-              :channel_id      => us.channel_id,
-              :locale          => credentials.locale,
-              :tnc_version     => credentials.tnc_version,
-              :application_id  => credentials.application_id,
-              :cobrand_conversation_credentials => {
-                :session_token => us.session_token,
-              },
-              :preference_info => preferences,
-              :fetch_all_locale_data => false,
-              :attributes! => {
-                :locale => { "xsi:type" => "tns1:Locale" },
-                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
-              }
+        #  soap.element_form_default = :unqualified
+        body = {
+          :cobrand_context => {
+            :cobrand_id      => credentials.cobrand_id,
+            :channel_id      => us.channel_id,
+            :locale          => credentials.locale,
+            :tnc_version     => credentials.tnc_version,
+            :application_id  => credentials.application_id,
+            :cobrand_conversation_credentials => {
+              :session_token => us.session_token,
             },
-            :content_service_id => content_service_id,
-            :order! => [:cobrand_context, :content_service_id],
+            :preference_info => preferences,
+            :fetch_all_locale_data => false,
             :attributes! => {
-              :cobrand_context => { "xsi:type" => "tns1:CobrandContext" }
+              :locale => { "xsi:type" => "tns1:Locale" },
+              :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
             }
+          },
+          :content_service_id => content_service_id,
+          :order! => [:cobrand_context, :content_service_id],
+          :attributes! => {
+            :cobrand_context => { "xsi:type" => "tns1:CobrandContext" }
           }
-        end
+        }
+        login_form_response = item_client.call :get_login_form_for_content_service, message: body
       end
     end
   end
@@ -418,48 +426,44 @@ module Halberd
     end
 
     def register!
-      @registration_response = registration_client.request :user_reg, :register3 do
-        soap.element_form_default = :unqualified
-        soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
-        soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
-        soap.namespaces['xmlns:common'] = "http://common.soap.yodlee.com"
-        soap.body = {
-          :cobrand_context => {
-            :cobrand_id      => credentials.cobrand_id,
-            :channel_id      => us.channel_id,
-            :locale          => credentials.locale,
-            :tnc_version     => credentials.tnc_version,
-            :application_id  => credentials.application_id,
-            :cobrand_conversation_credentials => {
-              :session_token => us.session_token,
-            },
-            :preference_info => preferences,
-            :fetch_all_locale_data => false,
-            :attributes! => {
-              :locale => { "xsi:type" => "tns1:Locale" },
-              :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
-            }
+      #  soap.element_form_default = :unqualified
+      body = {
+        :cobrand_context => {
+          :cobrand_id      => credentials.cobrand_id,
+          :channel_id      => us.channel_id,
+          :locale          => credentials.locale,
+          :tnc_version     => credentials.tnc_version,
+          :application_id  => credentials.application_id,
+          :cobrand_conversation_credentials => {
+            :session_token => us.session_token,
           },
-          :user_credentials => {
-            :login_name => username,
-            :password => password,
-            :order! => [:login_name, :password]
-          },
-          :user_profile => { :values => { :table => {
-            :key => 'EMAIL_ADDRESS',
-            :value => "support+#{username}@debteye.com",
-            :attributes! => {
-              :key => { "xsi:type" => "xsd:string" },
-              :value => { "xsi:type" => "xsd:string" }
-            }
-          } } },
-          :order! => [:cobrand_context, :user_credentials, :user_profile],
+          :preference_info => preferences,
+          :fetch_all_locale_data => false,
           :attributes! => {
-            :cobrand_context => { "xsi:type" => "tns1:CobrandContext" },
-            :user_credentials => { "xsi:type" => "login:PasswordCredentials" }
+            :locale => { "xsi:type" => "tns1:Locale" },
+            :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
           }
+        },
+        :user_credentials => {
+          :login_name => username,
+          :password => password,
+          :order! => [:login_name, :password]
+        },
+        :user_profile => { :values => { :table => {
+          :key => 'EMAIL_ADDRESS',
+          :value => "support+#{username}@debteye.com",
+          :attributes! => {
+            :key => { "xsi:type" => "xsd:string" },
+            :value => { "xsi:type" => "xsd:string" }
+          }
+        } } },
+        :order! => [:cobrand_context, :user_credentials, :user_profile],
+        :attributes! => {
+          :cobrand_context => { "xsi:type" => "tns1:CobrandContext" },
+          :user_credentials => { "xsi:type" => "login:PasswordCredentials" }
         }
-      end
+      }
+      @registration_response = registration_client.call :register3, message: body
 
       user_registered!
     end
@@ -471,40 +475,36 @@ module Halberd
     end
   
     def login!
-      @login_response = login_client.request :user_reg, :login2 do
-        soap.element_form_default = :unqualified
-        soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
-        soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
-        soap.namespaces['xmlns:common'] = "http://common.soap.yodlee.com"
-        soap.body = {
-          :cobrand_context => {
-            :cobrand_id      => credentials.cobrand_id,
-            :channel_id      => us.channel_id,
-            :locale          => credentials.locale,
-            :tnc_version     => credentials.tnc_version,
-            :application_id  => credentials.application_id,
-            :cobrand_conversation_credentials => {
-              :session_token => us.session_token,
-            },
-            :preference_info => preferences,
-            :fetch_all_locale_data => false,
-            :attributes! => {
-              :locale => { "xsi:type" => "tns1:Locale" },
-              :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
-            }
+      #  soap.element_form_default = :unqualified
+      body = {
+        :cobrand_context => {
+          :cobrand_id      => credentials.cobrand_id,
+          :channel_id      => us.channel_id,
+          :locale          => credentials.locale,
+          :tnc_version     => credentials.tnc_version,
+          :application_id  => credentials.application_id,
+          :cobrand_conversation_credentials => {
+            :session_token => us.session_token,
           },
-          :user_credentials => {
-            :login_name => username,
-            :password => password,
-            :order! => [:login_name, :password]
-          },
-          :order! => [:cobrand_context, :user_credentials],
+          :preference_info => preferences,
+          :fetch_all_locale_data => false,
           :attributes! => {
-            :cobrand_context => { "xsi:type" => "tns1:CobrandContext" },
-            :user_credentials => { "xsi:type" => "login:PasswordCredentials" }
+            :locale => { "xsi:type" => "tns1:Locale" },
+            :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
           }
+        },
+        :user_credentials => {
+          :login_name => username,
+          :password => password,
+          :order! => [:login_name, :password]
+        },
+        :order! => [:cobrand_context, :user_credentials],
+        :attributes! => {
+          :cobrand_context => { "xsi:type" => "tns1:CobrandContext" },
+          :user_credentials => { "xsi:type" => "login:PasswordCredentials" }
         }
-      end
+      }
+      @login_response = login_client.call :login2, message: body
    
       user_logged_in!
     end
@@ -590,165 +590,152 @@ module Halberd
       end
 
       def get_item_summary_for_item(item_id)
-        @detailed_summary_response = dataservice_client.request :lines, :get_item_summary_for_item do
-          soap.element_form_default = :unqualified
-          soap.namespaces['xmlns:collections'] = "http://collections.soap.yodlee.com"
-          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
-          soap.namespaces['xmlns:common'] = 'http://common.soap.yodlee.com'
-          soap.namespaces['xmlns:dataservice'] = "http://dataservice.core.soap.yodlee.com"
-          soap.body = {
-            :user_context => {
-              :cobrand_id      => credentials.cobrand_id,
-              :channel_id      => us.channel_id,
-              :locale          => credentials.locale,
-              :tnc_version     => credentials.tnc_version,
-              :application_id  => credentials.application_id,
-              :cobrand_conversation_credentials => {
-                :session_token => us.session_token,
-              },
-              :preference_info => prefs,
-              :fetch_all_locale_data => false,
-              :conversation_credentials => {
-                :session_token => you.session_token 
-              },
-              :valid => true,
-              :is_password_expired => false,
-              :attributes! => {
-                :locale => { "xsi:type" => "collections:Locale" },
-                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
-                :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
-              }
+        #  soap.element_form_default = :unqualified
+        body = {
+          :user_context => {
+            :cobrand_id      => credentials.cobrand_id,
+            :channel_id      => us.channel_id,
+            :locale          => credentials.locale,
+            :tnc_version     => credentials.tnc_version,
+            :application_id  => credentials.application_id,
+            :cobrand_conversation_credentials => {
+              :session_token => us.session_token,
             },
-            :item_id => item_id,
-            :order! => [:user_context, :item_id],
+            :preference_info => prefs,
+            :fetch_all_locale_data => false,
+            :conversation_credentials => {
+              :session_token => you.session_token 
+            },
+            :valid => true,
+            :is_password_expired => false,
             :attributes! => {
-              :user_context => { "xsi:type" => "common:UserContext"}
+              :locale => { "xsi:type" => "collections:Locale" },
+              :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
+              :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
             }
+          },
+          :item_id => item_id,
+          :order! => [:user_context, :item_id],
+          :attributes! => {
+            :user_context => { "xsi:type" => "common:UserContext"}
           }
-        end
+        }
+        @detailed_summary_response = dataservice_client.call :get_item_summary_for_item, message: body
       end
 
       def get_detailed_summary!
-        @detailed_summary_response = dataservice_client.request :lines, :get_item_summaries2 do
-          soap.element_form_default = :unqualified
-          soap.namespaces['xmlns:collections'] = "http://collections.soap.yodlee.com"
-          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
-          soap.namespaces['xmlns:common'] = 'http://common.soap.yodlee.com'
-          soap.namespaces['xmlns:dataservice'] = "http://dataservice.core.soap.yodlee.com"
-          soap.body = {
-            :user_context => {
-              :cobrand_id      => credentials.cobrand_id,
-              :channel_id      => us.channel_id,
-              :locale          => credentials.locale,
-              :tnc_version     => credentials.tnc_version,
-              :application_id  => credentials.application_id,
-              :cobrand_conversation_credentials => {
-                :session_token => us.session_token,
-              },
-              :preference_info => prefs,
-              :fetch_all_locale_data => false,
-              :conversation_credentials => {
-                :session_token => you.session_token 
-              },
-              :valid => true,
-              :is_password_expired => false,
-              :attributes! => {
-                :locale => { "xsi:type" => "collections:Locale" },
-                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
-                :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
-              }
+        #  soap.element_form_default = :unqualified
+
+        body = {
+          :user_context => {
+            :cobrand_id      => credentials.cobrand_id,
+            :channel_id      => us.channel_id,
+            :locale          => credentials.locale,
+            :tnc_version     => credentials.tnc_version,
+            :application_id  => credentials.application_id,
+            :cobrand_conversation_credentials => {
+              :session_token => us.session_token,
             },
-            :req => {
-                     :global_criteria => nil,
-                     :containerCriteria => {:elements => [{:container_type => "bank",
-                                                           :data_extent => {:start_level => 0, :end_level => 4}
-                                                          },
-                                                          {:container_type => "isp",
-                                                           :data_extent => {:start_level => 0, :end_level => 16}
-                                                          },
-                                                          {:container_type => "utilities",
-                                                           :data_extent => {:start_level => 0, :end_level => 16}
-                                                          },
-                                                          {:container_type => "bills",
-                                                           :data_extent => {:start_level => 0, :end_level => 16}
-                                                          },
-                                                          {:container_type => "cable_satellite",
-                                                           :data_extent => {:start_level => 0, :end_level => 16}
-                                                          },
-                                                          {:container_type => "loans",
-                                                           :data_extent => {:start_level => 0, :end_level => 16}
-                                                          },
-                                                          {:container_type => "telephone",
-                                                           :data_extent => {:start_level => 0, :end_level => 16}
-                                                          },
-                                                          {:container_type => "credits",
-                                                           :data_extent => {:start_level => 0, :end_level => 4}
-                                                          }],
-                                            :attributes! => {:elements => {'xsi:type' => 'dataservice:ContainerCriteria'}}
-                                           },
-                     :history_needed => false,
-                     :deleted_item_accounts_needed => false,
-                     :include_disabled_items => false,
-                     :content_service_info_required => false,
-                     :data_service_lite => false,
-                     :inactive_item_accounts_needed => false,
-                     :include_is_historic_bill_needed => false,
-                     :include_shared_accounts => false, 
-                     :include_account_additional_info => false,
-                     :tax_account_search_criteria => nil,
-                     :attributes! => { :containerCriteria => {"xsi:type" => "collections:List" }}
-                    },
-            :item_ids => {
-                          :elements => items 
-                         },
-            :order! => [:user_context, :req, :item_ids],
+            :preference_info => prefs,
+            :fetch_all_locale_data => false,
+            :conversation_credentials => {
+              :session_token => you.session_token 
+            },
+            :valid => true,
+            :is_password_expired => false,
             :attributes! => {
-              :user_context => { "xsi:type" => "common:UserContext"},
-              :item_ids => { "xsi:type" => "collections:ArrayOflong"}
+              :locale => { "xsi:type" => "collections:Locale" },
+              :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
+              :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
             }
+          },
+          :req => {
+                   :global_criteria => nil,
+                   :containerCriteria => {:elements => [{:container_type => "bank",
+                                                         :data_extent => {:start_level => 0, :end_level => 4}
+                                                        },
+                                                        {:container_type => "isp",
+                                                         :data_extent => {:start_level => 0, :end_level => 16}
+                                                        },
+                                                        {:container_type => "utilities",
+                                                         :data_extent => {:start_level => 0, :end_level => 16}
+                                                        },
+                                                        {:container_type => "bills",
+                                                         :data_extent => {:start_level => 0, :end_level => 16}
+                                                        },
+                                                        {:container_type => "cable_satellite",
+                                                         :data_extent => {:start_level => 0, :end_level => 16}
+                                                        },
+                                                        {:container_type => "loans",
+                                                         :data_extent => {:start_level => 0, :end_level => 16}
+                                                        },
+                                                        {:container_type => "telephone",
+                                                         :data_extent => {:start_level => 0, :end_level => 16}
+                                                        },
+                                                        {:container_type => "credits",
+                                                         :data_extent => {:start_level => 0, :end_level => 4}
+                                                        }],
+                                          :attributes! => {:elements => {'xsi:type' => 'dataservice:ContainerCriteria'}}
+                                         },
+                   :history_needed => false,
+                   :deleted_item_accounts_needed => false,
+                   :include_disabled_items => false,
+                   :content_service_info_required => false,
+                   :data_service_lite => false,
+                   :inactive_item_accounts_needed => false,
+                   :include_is_historic_bill_needed => false,
+                   :include_shared_accounts => false, 
+                   :include_account_additional_info => false,
+                   :tax_account_search_criteria => nil,
+                   :attributes! => { :containerCriteria => {"xsi:type" => "collections:List" }}
+                  },
+          :item_ids => {
+                        :elements => items 
+                       },
+          :order! => [:user_context, :req, :item_ids],
+          :attributes! => {
+            :user_context => { "xsi:type" => "common:UserContext"},
+            :item_ids => { "xsi:type" => "collections:ArrayOflong"}
           }
-        end
+        }
+        @detailed_summary_response = dataservice_client.call :get_item_summaries2, message: body
       end
 
       def get_summary!
-        @summary_response = dataservice_client.request :lines, :get_item_summaries3 do
-          soap.element_form_default = :unqualified
-          soap.namespaces['xmlns:collections'] = "http://collections.soap.yodlee.com"
-          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
-          soap.namespaces['xmlns:common'] = 'http://common.soap.yodlee.com'
-          soap.body = {
-            :user_context => {
-              :cobrand_id      => credentials.cobrand_id,
-              :channel_id      => us.channel_id,
-              :locale          => credentials.locale,
-              :tnc_version     => credentials.tnc_version,
-              :application_id  => credentials.application_id,
-              :cobrand_conversation_credentials => {
-                :session_token => us.session_token,
-              },
-              :preference_info => prefs,
-              :fetch_all_locale_data => false,
-              :conversation_credentials => {
-                :session_token => you.session_token 
-              },
-              :valid => true,
-              :is_password_expired => false,
-              :attributes! => {
-                :locale => { "xsi:type" => "collections:Locale" },
-                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
-                :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
-              }
+        #  soap.element_form_default = :unqualified
+        body = {
+          :user_context => {
+            :cobrand_id      => credentials.cobrand_id,
+            :channel_id      => us.channel_id,
+            :locale          => credentials.locale,
+            :tnc_version     => credentials.tnc_version,
+            :application_id  => credentials.application_id,
+            :cobrand_conversation_credentials => {
+              :session_token => us.session_token,
             },
-            :item_ids => {
-                          :elements => items 
-                         },
-            :order! => [:user_context, :item_ids],
+            :preference_info => prefs,
+            :fetch_all_locale_data => false,
+            :conversation_credentials => {
+              :session_token => you.session_token 
+            },
+            :valid => true,
+            :is_password_expired => false,
             :attributes! => {
-              :user_context => { "xsi:type" => "common:UserContext"},
-              :item_ids => { "xsi:type" => "collections:ArrayOflong"}
+              :locale => { "xsi:type" => "collections:Locale" },
+              :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
+              :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
             }
+          },
+          :item_ids => {
+                        :elements => items 
+                       },
+          :order! => [:user_context, :item_ids],
+          :attributes! => {
+            :user_context => { "xsi:type" => "common:UserContext"},
+            :item_ids => { "xsi:type" => "collections:ArrayOflong"}
           }
-        end
+        }
+        @summary_response = dataservice_client.call :get_item_summaries3, message: body
       end
 
       def put_mfa_request(item_id, opts = {})
@@ -775,11 +762,6 @@ module Halberd
         end
         @put_mfa_response = refresh_client.request :lines, 'putMFARequest' do
           soap.element_form_default = :unqualified
-          soap.namespaces['xmlns:collections'] = "http://collections.soap.yodlee.com"
-          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
-          soap.namespaces['xmlns:common'] = 'http://common.soap.yodlee.com'
-          soap.namespaces['xmlns:mfarefresh'] = 'http://mfarefresh.core.soap.yodlee.com'
-          soap.namespaces['xmlns:mfacollections'] = 'http://mfarefresh.core.collection.soap.yodlee.com'
           soap.body = {
             :user_context => {
               :cobrand_id      => credentials.cobrand_id,
@@ -817,9 +799,6 @@ module Halberd
       def get_mfa_response(item_id)
          @refresh_response = refresh_client.request :lines, 'getMFAResponse' do
           soap.element_form_default = :unqualified
-          soap.namespaces['xmlns:collections'] = "http://collections.soap.yodlee.com"
-          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
-          soap.namespaces['xmlns:common'] = 'http://common.soap.yodlee.com'
           soap.body = {
             :user_context => {
               :cobrand_id      => credentials.cobrand_id,
@@ -855,10 +834,6 @@ module Halberd
       def start_refresh7(item_id, opts = {})
         @refresh_response = refresh_client.request :lines, :start_refresh7 do
           soap.element_form_default = :unqualified
-          soap.namespaces['xmlns:collections'] = "http://collections.soap.yodlee.com"
-          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
-          soap.namespaces['xmlns:common'] = 'http://common.soap.yodlee.com'
-          soap.namespaces['xmlns:refresh'] = 'http://refresh.core.soap.yodlee.com'
           soap.body = {
             :user_context => {
               :cobrand_id      => credentials.cobrand_id,
@@ -901,9 +876,6 @@ module Halberd
       def start_refresh1(force = false)
         @refresh_response = refresh_client.request :lines, :start_refresh1 do
           soap.element_form_default = :unqualified
-          soap.namespaces['xmlns:collections'] = "http://collections.soap.yodlee.com"
-          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
-          soap.namespaces['xmlns:common'] = 'http://common.soap.yodlee.com'
           soap.body = {
             :user_context => {
               :cobrand_id      => credentials.cobrand_id,
@@ -944,9 +916,6 @@ module Halberd
       def get_refresh_info1
         @refresh_response = refresh_client.request :lines, :get_refresh_info1 do
           soap.element_form_default = :unqualified
-          soap.namespaces['xmlns:collections'] = "http://collections.soap.yodlee.com"
-          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
-          soap.namespaces['xmlns:common'] = 'http://common.soap.yodlee.com'
           soap.body = {
             :user_context => {
               :cobrand_id      => credentials.cobrand_id,
@@ -985,9 +954,6 @@ module Halberd
       def get_mfa_questions_and_answers_for_item(item_id)
         item = item_client.request :sl, :get_mfa_questions_and_answers_for_item do
           soap.element_form_default = :unqualified
-          soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
-          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
-          soap.namespaces['xmlns:common'] = 'http://common.soap.yodlee.com'
           soap.body = {
             :user_context => {
               :cobrand_id      => credentials.cobrand_id,
@@ -1025,9 +991,6 @@ module Halberd
       def get_login_form_credentials_for_item(item_id)
         item = item_client.request :sl, :get_login_form_credentials_for_item do
           soap.element_form_default = :unqualified
-          soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
-          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
-          soap.namespaces['xmlns:common'] = 'http://common.soap.yodlee.com'
           soap.body = {
             :user_context => {
               :cobrand_id      => credentials.cobrand_id,
@@ -1065,9 +1028,6 @@ module Halberd
       def start_verification_data_request1(item_id)
         item_verification = instant_verification_client.request :sl, :start_verification_data_request1 do
           soap.element_form_default = :unqualified
-          soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
-          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
-          soap.namespaces['xmlns:common'] = 'http://common.soap.yodlee.com'
           soap.body = {
             :user_context => {
               :cobrand_id      => credentials.cobrand_id,
@@ -1105,9 +1065,6 @@ module Halberd
       def instant_account_verification_status
         item_verification = instant_verification_client.request :sl, :get_item_verification_data do
           soap.element_form_default = :unqualified
-          soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
-          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
-          soap.namespaces['xmlns:common'] = 'http://common.soap.yodlee.com'
           soap.body = {
             :user_context => {
               :cobrand_id      => credentials.cobrand_id,
@@ -1157,9 +1114,6 @@ module Halberd
 
         @register_response = instant_verification_client.request :sl, :add_item_and_start_verification_data_request1 do
           soap.element_form_default = :unqualified
-          soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
-          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
-          soap.namespaces['xmlns:common'] = 'http://common.soap.yodlee.com'
           soap.body = {
             :user_context => {
               :cobrand_id      => credentials.cobrand_id,
@@ -1214,9 +1168,6 @@ module Halberd
 
         @update_response = item_client.request :sl, :update_credentials_for_item1 do
           soap.element_form_default = :unqualified
-          soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
-          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
-          soap.namespaces['xmlns:common'] = 'http://common.soap.yodlee.com'
           soap.body = {
             :user_context => {
               :cobrand_id      => credentials.cobrand_id,
@@ -1271,9 +1222,6 @@ module Halberd
  
         @update_response = item_client.request :sl, :update_credentials_for_item1 do
           soap.element_form_default = :unqualified
-          soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
-          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
-          soap.namespaces['xmlns:common'] = 'http://common.soap.yodlee.com'
 
           soap.body do |xml|
             xml.userContext("xsi:type" => "common:UserContext") do
@@ -1327,9 +1275,6 @@ module Halberd
 
         @register_response = item_client.request :sl, :add_item_for_content_service1 do
           soap.element_form_default = :unqualified
-          soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
-          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
-          soap.namespaces['xmlns:common'] = 'http://common.soap.yodlee.com'
           soap.body = {
             :user_context => {
               :cobrand_id      => credentials.cobrand_id,
@@ -1386,10 +1331,6 @@ module Halberd
  
         @register_response = item_client.request :sl, :add_item_for_content_service1 do
           soap.element_form_default = :unqualified
-          soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
-          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
-          soap.namespaces['xmlns:common'] = 'http://common.soap.yodlee.com'
-
           soap.body do |xml|
             xml.userContext("xsi:type" => "common:UserContext") do
               xml.cobrandId(credentials.cobrand_id)

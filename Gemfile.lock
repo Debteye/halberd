@@ -8,7 +8,7 @@ PATH
       savon_model (>= 1.0.0)
 
 GEM
-  remote: http://rubygems.org/
+  remote: https://rubygems.org/
   specs:
     akami (1.2.0)
       gyoku (>= 0.4.0)
