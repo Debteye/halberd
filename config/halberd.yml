@@ -1,7 +1,45 @@
-yodlee_url:
+development:
+  yodlee_url: "https://static.avantcredit.com"
+  credentials:
+    cobrand_id: "3910008380"
+    application_id: "270772870CDC1786FFEDECFDA1FDBC00"
+    cobrand_login: "private-avantcredit"
+    cobrand_password: "av87netu345cd$#u*d0"
+    tnc_version: 2
+    country: US
+    language: en
+  item_preferences:
+    currencyCode: USD
+    timeZone: CST
+    dateFormat: MM/dd/yyyy
+    currencyNotationType: SYMBOL_NOTATION
+production:
+  yodlee_url: "https://static.avantcredit.com"
+  credentials:
+    cobrand_id: '4010008380'
+    application_id: '270772870CDC1786FFEDECFDA1FDBC00'
+    cobrand_login: 'avantcredit'
+    cobrand_password: 'av87netu345cd$#u*d0'
+    tnc_version: 2
+    country: US
+    language: en
+  item_preferences:
+    currencyCode: USD
+    timeZone: CST
+    dateFormat: MM/dd/yyyy
+    currencyNotationType: SYMBOL_NOTATION
+yodlee_url: "https://static.avantcredit.com"
 credentials:
-  cobrand_id:
-  application_id:
-  cobrand_login:
-  cobrand_password:
-  tnc_version:
+  cobrand_id: "3910008380"
+  application_id: "270772870CDC1786FFEDECFDA1FDBC00"
+  cobrand_login: "private-avantcredit"
+  cobrand_password: "av87netu345cd$#u*d0"
+  tnc_version: 2
+  country: US
+  language: en
+item_preferences:
+  currencyCode: USD
+  timeZone: CST
+  dateFormat: MM/dd/yyyy
+  currencyNotationType: SYMBOL_NOTATION
+

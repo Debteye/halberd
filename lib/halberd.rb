@@ -760,344 +760,335 @@ module Halberd
             :attributes! => {:ques_ans_detail_array => {"xsi:type" => "mfacollections:ArrayOfQuesAndAnswerDetails"}}
             }
         end
-        @put_mfa_response = refresh_client.request :lines, 'putMFARequest' do
-          soap.element_form_default = :unqualified
-          soap.body = {
-            :user_context => {
-              :cobrand_id      => credentials.cobrand_id,
-              :channel_id      => us.channel_id,
-              :locale          => credentials.locale,
-              :tnc_version     => credentials.tnc_version,
-              :application_id  => credentials.application_id,
-              :cobrand_conversation_credentials => {
-                :session_token => us.session_token,
-              },
-              :preference_info => prefs,
-              :fetch_all_locale_data => false,
-              :conversation_credentials => {
-                :session_token => you.session_token 
-              },
-              :valid => true,
-              :is_password_expired => false,
-              :attributes! => {
-                :locale => { "xsi:type" => "collections:Locale" },
-                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
-                :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
-              }
+        #  soap.element_form_default = :unqualified
+        body = {
+          :user_context => {
+            :cobrand_id      => credentials.cobrand_id,
+            :channel_id      => us.channel_id,
+            :locale          => credentials.locale,
+            :tnc_version     => credentials.tnc_version,
+            :application_id  => credentials.application_id,
+            :cobrand_conversation_credentials => {
+              :session_token => us.session_token,
             },
-            :user_response => user_response,
-            :item_id => item_id,
-            :order! => [:user_context, :user_response,:item_id],
+            :preference_info => prefs,
+            :fetch_all_locale_data => false,
+            :conversation_credentials => {
+              :session_token => you.session_token 
+            },
+            :valid => true,
+            :is_password_expired => false,
             :attributes! => {
-              :user_context => { "xsi:type" => "common:UserContext"},
-              :user_response => { "xsi:type" => "mfarefresh:#{user_response_type}" }
+              :locale => { "xsi:type" => "collections:Locale" },
+              :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
+              :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
             }
+          },
+          :user_response => user_response,
+          :item_id => item_id,
+          :order! => [:user_context, :user_response,:item_id],
+          :attributes! => {
+            :user_context => { "xsi:type" => "common:UserContext"},
+            :user_response => { "xsi:type" => "mfarefresh:#{user_response_type}" }
           }
-        end
+        }
+        @put_mfa_response = refresh_client.call 'putMFARequest', message: body
       end
 
       def get_mfa_response(item_id)
-         @refresh_response = refresh_client.request :lines, 'getMFAResponse' do
-          soap.element_form_default = :unqualified
-          soap.body = {
-            :user_context => {
-              :cobrand_id      => credentials.cobrand_id,
-              :channel_id      => us.channel_id,
-              :locale          => credentials.locale,
-              :tnc_version     => credentials.tnc_version,
-              :application_id  => credentials.application_id,
-              :cobrand_conversation_credentials => {
-                :session_token => us.session_token,
-              },
-              :preference_info => prefs,
-              :fetch_all_locale_data => false,
-              :conversation_credentials => {
-                :session_token => you.session_token 
-              },
-              :valid => true,
-              :is_password_expired => false,
-              :attributes! => {
-                :locale => { "xsi:type" => "collections:Locale" },
-                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
-                :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
-              }
+        #  soap.element_form_default = :unqualified
+        body = {
+          :user_context => {
+            :cobrand_id      => credentials.cobrand_id,
+            :channel_id      => us.channel_id,
+            :locale          => credentials.locale,
+            :tnc_version     => credentials.tnc_version,
+            :application_id  => credentials.application_id,
+            :cobrand_conversation_credentials => {
+              :session_token => us.session_token,
             },
-            :item_id => item_id,
-            :order! => [:user_context, :item_id],
+            :preference_info => prefs,
+            :fetch_all_locale_data => false,
+            :conversation_credentials => {
+              :session_token => you.session_token 
+            },
+            :valid => true,
+            :is_password_expired => false,
             :attributes! => {
-              :user_context => { "xsi:type" => "common:UserContext"},
+              :locale => { "xsi:type" => "collections:Locale" },
+              :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
+              :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
             }
+          },
+          :item_id => item_id,
+          :order! => [:user_context, :item_id],
+          :attributes! => {
+            :user_context => { "xsi:type" => "common:UserContext"},
           }
-        end
+        }
+        @refresh_response = refresh_client.call 'getMFAResponse', message: body
       end
 
       def start_refresh7(item_id, opts = {})
-        @refresh_response = refresh_client.request :lines, :start_refresh7 do
-          soap.element_form_default = :unqualified
-          soap.body = {
-            :user_context => {
-              :cobrand_id      => credentials.cobrand_id,
-              :channel_id      => us.channel_id,
-              :locale          => credentials.locale,
-              :tnc_version     => credentials.tnc_version,
-              :application_id  => credentials.application_id,
-              :cobrand_conversation_credentials => {
-                :session_token => us.session_token,
-              },
-              :preference_info => prefs,
-              :fetch_all_locale_data => false,
-              :conversation_credentials => {
-                :session_token => you.session_token 
-              },
-              :valid => true,
-              :is_password_expired => false,
-              :attributes! => {
-                :locale => { "xsi:type" => "collections:Locale" },
-                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
-                :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
-              }
+        #  soap.element_form_default = :unqualified
+        body = {
+          :user_context => {
+            :cobrand_id      => credentials.cobrand_id,
+            :channel_id      => us.channel_id,
+            :locale          => credentials.locale,
+            :tnc_version     => credentials.tnc_version,
+            :application_id  => credentials.application_id,
+            :cobrand_conversation_credentials => {
+              :session_token => us.session_token,
             },
-            :item_id => item_id,
-            :refresh_parameters => {:force_refresh => opts[:force],
-                                    :refresh_mode => opts[:mfa] ? "MFA_REFRESH_MODE" : "NORMAL_REFRESH_MODE",
-                                    :refresh_priority => 2,
-                                    :order! => [:refresh_priority, :force_refresh, :refresh_mode],
-                                    :attributes! => {:refresh_mode => {'xsi:type' => 'refresh:RefreshMode'}}
-                                   },
-            :order! => [:user_context, :item_id, :refresh_parameters],
+            :preference_info => prefs,
+            :fetch_all_locale_data => false,
+            :conversation_credentials => {
+              :session_token => you.session_token 
+            },
+            :valid => true,
+            :is_password_expired => false,
             :attributes! => {
-              :user_context => { "xsi:type" => "common:UserContext"},
-              :refresh_parameters => { "xsi:type" => "refresh:RefreshParameters"},
+              :locale => { "xsi:type" => "collections:Locale" },
+              :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
+              :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
             }
+          },
+          :item_id => item_id,
+          :refresh_parameters => {:force_refresh => opts[:force],
+                                  :refresh_mode => opts[:mfa] ? "MFA_REFRESH_MODE" : "NORMAL_REFRESH_MODE",
+                                  :refresh_priority => 2,
+                                  :order! => [:refresh_priority, :force_refresh, :refresh_mode],
+                                  :attributes! => {:refresh_mode => {'xsi:type' => 'refresh:RefreshMode'}}
+                                 },
+          :order! => [:user_context, :item_id, :refresh_parameters],
+          :attributes! => {
+            :user_context => { "xsi:type" => "common:UserContext"},
+            :refresh_parameters => { "xsi:type" => "refresh:RefreshParameters"},
           }
-        end
+        }
+        @refresh_response = refresh_client.call :start_refresh7, message: body
       end
 
       def start_refresh1(force = false)
-        @refresh_response = refresh_client.request :lines, :start_refresh1 do
-          soap.element_form_default = :unqualified
-          soap.body = {
-            :user_context => {
-              :cobrand_id      => credentials.cobrand_id,
-              :channel_id      => us.channel_id,
-              :locale          => credentials.locale,
-              :tnc_version     => credentials.tnc_version,
-              :application_id  => credentials.application_id,
-              :cobrand_conversation_credentials => {
-                :session_token => us.session_token,
-              },
-              :preference_info => prefs,
-              :fetch_all_locale_data => false,
-              :conversation_credentials => {
-                :session_token => you.session_token 
-              },
-              :valid => true,
-              :is_password_expired => false,
-              :attributes! => {
-                :locale => { "xsi:type" => "collections:Locale" },
-                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
-                :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
-              }
+       #   soap.element_form_default = :unqualified
+        body = {
+          :user_context => {
+            :cobrand_id      => credentials.cobrand_id,
+            :channel_id      => us.channel_id,
+            :locale          => credentials.locale,
+            :tnc_version     => credentials.tnc_version,
+            :application_id  => credentials.application_id,
+            :cobrand_conversation_credentials => {
+              :session_token => us.session_token,
             },
-            :item_ids => {
-                          :elements => items 
-                         },
-            :refresh_priority => 2,
-            :force_refresh => force,
-            :order! => [:user_context, :item_ids, :refresh_priority, :force_refresh],
+            :preference_info => prefs,
+            :fetch_all_locale_data => false,
+            :conversation_credentials => {
+              :session_token => you.session_token 
+            },
+            :valid => true,
+            :is_password_expired => false,
             :attributes! => {
-              :user_context => { "xsi:type" => "common:UserContext"},
-              :item_ids => { "xsi:type" => "collections:ArrayOflong"}
+              :locale => { "xsi:type" => "collections:Locale" },
+              :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
+              :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
             }
+          },
+          :item_ids => {
+                        :elements => items 
+                       },
+          :refresh_priority => 2,
+          :force_refresh => force,
+          :order! => [:user_context, :item_ids, :refresh_priority, :force_refresh],
+          :attributes! => {
+            :user_context => { "xsi:type" => "common:UserContext"},
+            :item_ids => { "xsi:type" => "collections:ArrayOflong"}
           }
-        end
+        }
+        @refresh_response = refresh_client.call :start_refresh1, message: body
       end
 
       def get_refresh_info1
-        @refresh_response = refresh_client.request :lines, :get_refresh_info1 do
-          soap.element_form_default = :unqualified
-          soap.body = {
-            :user_context => {
-              :cobrand_id      => credentials.cobrand_id,
-              :channel_id      => us.channel_id,
-              :locale          => credentials.locale,
-              :tnc_version     => credentials.tnc_version,
-              :application_id  => credentials.application_id,
-              :cobrand_conversation_credentials => {
-                :session_token => us.session_token,
-              },
-              :preference_info => prefs,
-              :fetch_all_locale_data => false,
-              :conversation_credentials => {
-                :session_token => you.session_token 
-              },
-              :valid => true,
-              :is_password_expired => false,
-              :attributes! => {
-                :locale => { "xsi:type" => "collections:Locale" },
-                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
-                :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
-              }
+        #  soap.element_form_default = :unqualified
+        body = {
+          :user_context => {
+            :cobrand_id      => credentials.cobrand_id,
+            :channel_id      => us.channel_id,
+            :locale          => credentials.locale,
+            :tnc_version     => credentials.tnc_version,
+            :application_id  => credentials.application_id,
+            :cobrand_conversation_credentials => {
+              :session_token => us.session_token,
             },
-            :item_ids => {
-                          :elements => items 
-                         },
-            :order! => [:user_context, :item_ids],
+            :preference_info => prefs,
+            :fetch_all_locale_data => false,
+            :conversation_credentials => {
+              :session_token => you.session_token 
+            },
+            :valid => true,
+            :is_password_expired => false,
             :attributes! => {
-              :user_context => { "xsi:type" => "common:UserContext"},
-              :item_ids => { "xsi:type" => "collections:ArrayOflong"}
+              :locale => { "xsi:type" => "collections:Locale" },
+              :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
+              :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
             }
+          },
+          :item_ids => {
+                        :elements => items 
+                       },
+          :order! => [:user_context, :item_ids],
+          :attributes! => {
+            :user_context => { "xsi:type" => "common:UserContext"},
+            :item_ids => { "xsi:type" => "collections:ArrayOflong"}
           }
-        end
+        }
+        @refresh_response = refresh_client.call :get_refresh_info1, message: body
       end
 
       def get_mfa_questions_and_answers_for_item(item_id)
-        item = item_client.request :sl, :get_mfa_questions_and_answers_for_item do
-          soap.element_form_default = :unqualified
-          soap.body = {
-            :user_context => {
-              :cobrand_id      => credentials.cobrand_id,
-              :channel_id      => us.channel_id, 
-              :locale          => credentials.locale,
-              :tnc_version     => credentials.tnc_version,
-              :application_id  => credentials.application_id,
-              :cobrand_conversation_credentials => {
-                :session_token => us.session_token
-              },
-              :preference_info => prefs,
-              :fetch_all_locale_data => false,
-              :conversation_credentials => {
-                :session_token => you.session_token 
-              },
-              :valid => true,
-              :is_password_expired => false,
-              :attributes! => {
-                :locale => { "xsi:type" => "collections:Locale" },
-                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
-                :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
-              }
+        #  soap.element_form_default = :unqualified
+        body = {
+          :user_context => {
+            :cobrand_id      => credentials.cobrand_id,
+            :channel_id      => us.channel_id, 
+            :locale          => credentials.locale,
+            :tnc_version     => credentials.tnc_version,
+            :application_id  => credentials.application_id,
+            :cobrand_conversation_credentials => {
+              :session_token => us.session_token
             },
-            :mem_item_id => item_id,
-            :order! => [:user_context, :mem_item_id],
+            :preference_info => prefs,
+            :fetch_all_locale_data => false,
+            :conversation_credentials => {
+              :session_token => you.session_token 
+            },
+            :valid => true,
+            :is_password_expired => false,
             :attributes! => {
-              :user_context => { "xsi:type" => "common:UserContext" },
+              :locale => { "xsi:type" => "collections:Locale" },
+              :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
+              :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
             }
+          },
+          :mem_item_id => item_id,
+          :order! => [:user_context, :mem_item_id],
+          :attributes! => {
+            :user_context => { "xsi:type" => "common:UserContext" },
           }
-        end
+        }
+        item = item_client.call :get_mfa_questions_and_answers_for_item, message: body
 
         item
       end
 
       def get_login_form_credentials_for_item(item_id)
-        item = item_client.request :sl, :get_login_form_credentials_for_item do
-          soap.element_form_default = :unqualified
-          soap.body = {
-            :user_context => {
-              :cobrand_id      => credentials.cobrand_id,
-              :channel_id      => us.channel_id, 
-              :locale          => credentials.locale,
-              :tnc_version     => credentials.tnc_version,
-              :application_id  => credentials.application_id,
-              :cobrand_conversation_credentials => {
-                :session_token => us.session_token
-              },
-              :preference_info => prefs,
-              :fetch_all_locale_data => false,
-              :conversation_credentials => {
-                :session_token => you.session_token 
-              },
-              :valid => true,
-              :is_password_expired => false,
-              :attributes! => {
-                :locale => { "xsi:type" => "collections:Locale" },
-                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
-                :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
-              }
+        #  soap.element_form_default = :unqualified
+        body = {
+          :user_context => {
+            :cobrand_id      => credentials.cobrand_id,
+            :channel_id      => us.channel_id, 
+            :locale          => credentials.locale,
+            :tnc_version     => credentials.tnc_version,
+            :application_id  => credentials.application_id,
+            :cobrand_conversation_credentials => {
+              :session_token => us.session_token
             },
-            :item_id => item_id,
-            :order! => [:user_context, :item_id],
+            :preference_info => prefs,
+            :fetch_all_locale_data => false,
+            :conversation_credentials => {
+              :session_token => you.session_token 
+            },
+            :valid => true,
+            :is_password_expired => false,
             :attributes! => {
-              :user_context => { "xsi:type" => "common:UserContext" },
+              :locale => { "xsi:type" => "collections:Locale" },
+              :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
+              :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
             }
+          },
+          :item_id => item_id,
+          :order! => [:user_context, :item_id],
+          :attributes! => {
+            :user_context => { "xsi:type" => "common:UserContext" },
           }
-        end
+        }
+        item = item_client.call :get_login_form_credentials_for_item, message: body
 
         item
       end
 
       def start_verification_data_request1(item_id)
-        item_verification = instant_verification_client.request :sl, :start_verification_data_request1 do
-          soap.element_form_default = :unqualified
-          soap.body = {
-            :user_context => {
-              :cobrand_id      => credentials.cobrand_id,
-              :channel_id      => us.channel_id, 
-              :locale          => credentials.locale,
-              :tnc_version     => credentials.tnc_version,
-              :application_id  => credentials.application_id,
-              :cobrand_conversation_credentials => {
-                :session_token => us.session_token
-              },
-              :preference_info => prefs,
-              :fetch_all_locale_data => false,
-              :conversation_credentials => {
-                :session_token => you.session_token 
-              },
-              :valid => true,
-              :is_password_expired => false,
-              :attributes! => {
-                :locale => { "xsi:type" => "collections:Locale" },
-                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
-                :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
-              }
+        #  soap.element_form_default = :unqualified
+        body = {
+          :user_context => {
+            :cobrand_id      => credentials.cobrand_id,
+            :channel_id      => us.channel_id, 
+            :locale          => credentials.locale,
+            :tnc_version     => credentials.tnc_version,
+            :application_id  => credentials.application_id,
+            :cobrand_conversation_credentials => {
+              :session_token => us.session_token
             },
-            :item_id => item_id,
-            :order! => [:user_context, :item_id],
+            :preference_info => prefs,
+            :fetch_all_locale_data => false,
+            :conversation_credentials => {
+              :session_token => you.session_token 
+            },
+            :valid => true,
+            :is_password_expired => false,
             :attributes! => {
-              :user_context => { "xsi:type" => "common:UserContext" },
+              :locale => { "xsi:type" => "collections:Locale" },
+              :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
+              :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
             }
+          },
+          :item_id => item_id,
+          :order! => [:user_context, :item_id],
+          :attributes! => {
+            :user_context => { "xsi:type" => "common:UserContext" },
           }
-        end
+        }
+        item_verification = instant_verification_client.call :start_verification_data_request1, message: body
 
         item_verification
       end
 
       def instant_account_verification_status
-        item_verification = instant_verification_client.request :sl, :get_item_verification_data do
-          soap.element_form_default = :unqualified
-          soap.body = {
-            :user_context => {
-              :cobrand_id      => credentials.cobrand_id,
-              :channel_id      => us.channel_id, 
-              :locale          => credentials.locale,
-              :tnc_version     => credentials.tnc_version,
-              :application_id  => credentials.application_id,
-              :cobrand_conversation_credentials => {
-                :session_token => us.session_token
-              },
-              :preference_info => prefs,
-              :fetch_all_locale_data => false,
-              :conversation_credentials => {
-                :session_token => you.session_token 
-              },
-              :valid => true,
-              :is_password_expired => false,
-              :attributes! => {
-                :locale => { "xsi:type" => "collections:Locale" },
-                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
-                :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
-              }
+        #  soap.element_form_default = :unqualified
+        body = {
+          :user_context => {
+            :cobrand_id      => credentials.cobrand_id,
+            :channel_id      => us.channel_id, 
+            :locale          => credentials.locale,
+            :tnc_version     => credentials.tnc_version,
+            :application_id  => credentials.application_id,
+            :cobrand_conversation_credentials => {
+              :session_token => us.session_token
             },
-            :item_ids => {
-              :elements => items,
+            :preference_info => prefs,
+            :fetch_all_locale_data => false,
+            :conversation_credentials => {
+              :session_token => you.session_token 
             },
-            :order! => [:user_context, :item_ids],
+            :valid => true,
+            :is_password_expired => false,
             :attributes! => {
-              :user_context => { "xsi:type" => "common:UserContext" },
-              :item_ids => { "xsi:type" => "collections:ArrayOflong" }
+              :locale => { "xsi:type" => "collections:Locale" },
+              :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
+              :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
             }
+          },
+          :item_ids => {
+            :elements => items,
+          },
+          :order! => [:user_context, :item_ids],
+          :attributes! => {
+            :user_context => { "xsi:type" => "common:UserContext" },
+            :item_ids => { "xsi:type" => "collections:ArrayOflong" }
           }
-        end
+        }
+        item_verification = instant_verification_client.call :get_item_verification_data, message: body
 
         item_verification
       end
@@ -1112,44 +1103,43 @@ module Halberd
           end
         end
 
-        @register_response = instant_verification_client.request :sl, :add_item_and_start_verification_data_request1 do
-          soap.element_form_default = :unqualified
-          soap.body = {
-            :user_context => {
-              :cobrand_id      => credentials.cobrand_id,
-              :channel_id      => us.channel_id,
-              :locale          => credentials.locale,
-              :tnc_version     => credentials.tnc_version,
-              :application_id  => credentials.application_id,
-              :cobrand_conversation_credentials => {
-                :session_token => us.session_token,
-              },
-              :preference_info => prefs,
-              :fetch_all_locale_data => false,
-              :conversation_credentials => {
-                :session_token => you.session_token 
-              },
-              :valid => true,
-              :is_password_expired => false,
-              :attributes! => {
-                :locale => { "xsi:type" => "collections:Locale" },
-                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
-                :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
-              }
+        #  soap.element_form_default = :unqualified
+        body = {
+          :user_context => {
+            :cobrand_id      => credentials.cobrand_id,
+            :channel_id      => us.channel_id,
+            :locale          => credentials.locale,
+            :tnc_version     => credentials.tnc_version,
+            :application_id  => credentials.application_id,
+            :cobrand_conversation_credentials => {
+              :session_token => us.session_token,
             },
-            :content_service_id => content_service_id,
-            :credential_fields => {
-              :elements => user_credentials,
-              :attributes! => {
-                :elements => { "xsi:type" => "common:FieldInfoSingle" },
-              }
+            :preference_info => prefs,
+            :fetch_all_locale_data => false,
+            :conversation_credentials => {
+              :session_token => you.session_token 
             },
-            :order! => [:user_context, :content_service_id, :credential_fields],
+            :valid => true,
+            :is_password_expired => false,
             :attributes! => {
-              :user_context => { "xsi:type" => "common:UserContext" },
+              :locale => { "xsi:type" => "collections:Locale" },
+              :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
+              :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
             }
+          },
+          :content_service_id => content_service_id,
+          :credential_fields => {
+            :elements => user_credentials,
+            :attributes! => {
+              :elements => { "xsi:type" => "common:FieldInfoSingle" },
+            }
+          },
+          :order! => [:user_context, :content_service_id, :credential_fields],
+          :attributes! => {
+            :user_context => { "xsi:type" => "common:UserContext" },
           }
-        end
+        }
+        @register_response = instant_verification_client.call :add_item_and_start_verification_data_request1, message: body
 
         @items << register_response.to_hash[:add_item_and_start_verification_data_request1_response][:add_item_and_start_verification_data_request1_return]
         register_response.to_hash[:add_item_and_start_verification_data_request1_response][:add_item_and_start_verification_data_request1_return]
@@ -1166,45 +1156,45 @@ module Halberd
           end
         end
 
-        @update_response = item_client.request :sl, :update_credentials_for_item1 do
-          soap.element_form_default = :unqualified
-          soap.body = {
-            :user_context => {
-              :cobrand_id      => credentials.cobrand_id,
-              :channel_id      => us.channel_id,
-              :locale          => credentials.locale,
-              :tnc_version     => credentials.tnc_version,
-              :application_id  => credentials.application_id,
-              :cobrand_conversation_credentials => {
-                :session_token => us.session_token,
-              },
-              :preference_info => prefs,
-              :fetch_all_locale_data => false,
-              :conversation_credentials => {
-                :session_token => you.session_token 
-              },
-              :valid => true,
-              :is_password_expired => false,
-              :attributes! => {
-                :locale => { "xsi:type" => "collections:Locale" },
-                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
-                :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
-              }
+        #  soap.element_form_default = :unqualified
+        body = {
+          :user_context => {
+            :cobrand_id      => credentials.cobrand_id,
+            :channel_id      => us.channel_id,
+            :locale          => credentials.locale,
+            :tnc_version     => credentials.tnc_version,
+            :application_id  => credentials.application_id,
+            :cobrand_conversation_credentials => {
+              :session_token => us.session_token,
             },
-            :item_id => item_id,
-            :credential_fields => {
-              :elements => user_credentials,
-              :attributes! => {
-                :elements => { "xsi:type" => "common:FieldInfoSingle" },
-              }
+            :preference_info => prefs,
+            :fetch_all_locale_data => false,
+            :conversation_credentials => {
+              :session_token => you.session_token 
             },
-            :start_refresh_item_on_update => refresh,
-            :order! => [:user_context, :item_id, :credential_fields, :start_refresh_item_on_update],
+            :valid => true,
+            :is_password_expired => false,
             :attributes! => {
-              :user_context => { "xsi:type" => "common:UserContext" },
+              :locale => { "xsi:type" => "collections:Locale" },
+              :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
+              :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
             }
+          },
+          :item_id => item_id,
+          :credential_fields => {
+            :elements => user_credentials,
+            :attributes! => {
+              :elements => { "xsi:type" => "common:FieldInfoSingle" },
+            }
+          },
+          :start_refresh_item_on_update => refresh,
+          :order! => [:user_context, :item_id, :credential_fields, :start_refresh_item_on_update],
+          :attributes! => {
+            :user_context => { "xsi:type" => "common:UserContext" },
           }
-        end
+        }
+
+        @update_response = item_client.call :update_credentials_for_item1, message: body
 
         @update_response.to_hash
       end
@@ -1220,43 +1210,43 @@ module Halberd
           end
         end
  
-        @update_response = item_client.request :sl, :update_credentials_for_item1 do
-          soap.element_form_default = :unqualified
-
-          soap.body do |xml|
-            xml.userContext("xsi:type" => "common:UserContext") do
-              xml.cobrandId(credentials.cobrand_id)
-              xml.channelId(us.channel_id)
-              xml.locale("xsi:type" => "collections:Locale") do
-                credentials.locale.each_pair do |k,v|
-                  xml.tag!(k,v)
-                end
-              end
-              xml.tncVersion(credentials.tnc_version)
-              xml.applicationId(credentials.application_id)
-              xml.cobrandConversationCredentials("xsi:type" => "login:SessionCredentials") do
-                xml.sessionToken(us.session_token)
-              end
-              xml.preferenceInfo do 
-                prefs.each_pair do |k,v| 
-                  xml.tag!(k, v)
-                end
-              end
-              xml.conversationCredentials("xsi:type" => "login:SessionCredentials") do
-                xml.sessionToken(you.session_token)
-              end
-              xml.valid(true)
-              xml.isPasswordExpired(false)
+        #  soap.element_form_default = :unqualified
+        xml = Builder::XmlMarkup.new
+        xml.instruct!(:xml, encoding: "UTF-8")
+        
+        xml.userContext("xsi:type" => "common:UserContext") do
+          xml.cobrandId(credentials.cobrand_id)
+          xml.channelId(us.channel_id)
+          xml.locale("xsi:type" => "collections:Locale") do
+            credentials.locale.each_pair do |k,v|
+              xml.tag!(k,v)
             end
-            
-            xml.itemId(item_id)
-            xml.credentialFields do
-              Halberd::Utils.new.tag_xml(xml, 'elements', user_credentials)
-            end 
-            
-            xml.startRefreshItemOnUpdate(refresh)
           end
+          xml.tncVersion(credentials.tnc_version)
+          xml.applicationId(credentials.application_id)
+          xml.cobrandConversationCredentials("xsi:type" => "login:SessionCredentials") do
+            xml.sessionToken(us.session_token)
+          end
+          xml.preferenceInfo do 
+            prefs.each_pair do |k,v| 
+              xml.tag!(k, v)
+            end
+          end
+          xml.conversationCredentials("xsi:type" => "login:SessionCredentials") do
+            xml.sessionToken(you.session_token)
+          end
+          xml.valid(true)
+          xml.isPasswordExpired(false)
         end
+        
+        xml.itemId(item_id)
+        xml.credentialFields do
+          Halberd::Utils.new.tag_xml(xml, 'elements', user_credentials)
+        end 
+        
+        xml.startRefreshItemOnUpdate(refresh)
+  
+        @update_response = item_client.call :update_credentials_for_item1, message: xml
 
         register_response.to_hash[:update_credentials_for_item1_response][:update_credentials_for_item1_return]
       end
@@ -1273,46 +1263,46 @@ module Halberd
           end
         end
 
-        @register_response = item_client.request :sl, :add_item_for_content_service1 do
-          soap.element_form_default = :unqualified
-          soap.body = {
-            :user_context => {
-              :cobrand_id      => credentials.cobrand_id,
-              :channel_id      => us.channel_id,
-              :locale          => credentials.locale,
-              :tnc_version     => credentials.tnc_version,
-              :application_id  => credentials.application_id,
-              :cobrand_conversation_credentials => {
-                :session_token => us.session_token,
-              },
-              :preference_info => prefs,
-              :fetch_all_locale_data => false,
-              :conversation_credentials => {
-                :session_token => you.session_token 
-              },
-              :valid => true,
-              :is_password_expired => false,
-              :attributes! => {
-                :locale => { "xsi:type" => "collections:Locale" },
-                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
-                :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
-              }
+        #  soap.element_form_default = :unqualified
+        body = {
+          :user_context => {
+            :cobrand_id      => credentials.cobrand_id,
+            :channel_id      => us.channel_id,
+            :locale          => credentials.locale,
+            :tnc_version     => credentials.tnc_version,
+            :application_id  => credentials.application_id,
+            :cobrand_conversation_credentials => {
+              :session_token => us.session_token,
             },
-            :content_service_id => content_service_id,
-            :credential_fields => {
-              :elements => user_credentials,
-              :attributes! => {
-                :elements => { "xsi:type" => "common:FieldInfoSingle" },
-              }
+            :preference_info => prefs,
+            :fetch_all_locale_data => false,
+            :conversation_credentials => {
+              :session_token => you.session_token 
             },
-            :share_credentials_within_site => true,
-            :start_refresh_item_on_addition => refresh,
-            :order! => [:user_context, :content_service_id, :credential_fields, :share_credentials_within_site, :start_refresh_item_on_addition],
+            :valid => true,
+            :is_password_expired => false,
             :attributes! => {
-              :user_context => { "xsi:type" => "common:UserContext" },
+              :locale => { "xsi:type" => "collections:Locale" },
+              :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
+              :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
             }
+          },
+          :content_service_id => content_service_id,
+          :credential_fields => {
+            :elements => user_credentials,
+            :attributes! => {
+              :elements => { "xsi:type" => "common:FieldInfoSingle" },
+            }
+          },
+          :share_credentials_within_site => true,
+          :start_refresh_item_on_addition => refresh,
+          :order! => [:user_context, :content_service_id, :credential_fields, :share_credentials_within_site, :start_refresh_item_on_addition],
+          :attributes! => {
+            :user_context => { "xsi:type" => "common:UserContext" },
           }
-        end
+        }
+
+        @register_response = item_client.call :add_item_for_content_service1, message: body
 
         item_registered!
         register_response.to_hash[:add_item_for_content_service1_response][:add_item_for_content_service1_return]
@@ -1329,43 +1319,43 @@ module Halberd
           end
         end
  
-        @register_response = item_client.request :sl, :add_item_for_content_service1 do
-          soap.element_form_default = :unqualified
-          soap.body do |xml|
-            xml.userContext("xsi:type" => "common:UserContext") do
-              xml.cobrandId(credentials.cobrand_id)
-              xml.channelId(us.channel_id)
-              xml.locale("xsi:type" => "collections:Locale") do
-                credentials.locale.each_pair do |k,v|
-                  xml.tag!(k,v)
-                end
-              end
-              xml.tncVersion(credentials.tnc_version)
-              xml.applicationId(credentials.application_id)
-              xml.cobrandConversationCredentials("xsi:type" => "login:SessionCredentials") do
-                xml.sessionToken(us.session_token)
-              end
-              xml.preferenceInfo do 
-                prefs.each_pair do |k,v| 
-                  xml.tag!(k, v)
-                end
-              end
-              xml.conversationCredentials("xsi:type" => "login:SessionCredentials") do
-                xml.sessionToken(you.session_token)
-              end
-              xml.valid(true)
-              xml.isPasswordExpired(false)
+        #  soap.element_form_default = :unqualified
+        xml = Builder::XmlMarkup.new
+        xml.instruct!(:xml, encoding: "UTF-8")
+ 
+        xml.userContext("xsi:type" => "common:UserContext") do
+          xml.cobrandId(credentials.cobrand_id)
+          xml.channelId(us.channel_id)
+          xml.locale("xsi:type" => "collections:Locale") do
+            credentials.locale.each_pair do |k,v|
+              xml.tag!(k,v)
             end
-            
-            xml.contentServiceId(content_service_id)
-            xml.credentialFields do
-              Halberd::Utils.new.tag_xml(xml, 'elements', user_credentials)
-            end 
-            
-            xml.shareCredentialsWithinSite(true)
-            xml.startRefreshItemOnAddition(refresh)
           end
+          xml.tncVersion(credentials.tnc_version)
+          xml.applicationId(credentials.application_id)
+          xml.cobrandConversationCredentials("xsi:type" => "login:SessionCredentials") do
+            xml.sessionToken(us.session_token)
+          end
+          xml.preferenceInfo do 
+            prefs.each_pair do |k,v| 
+              xml.tag!(k, v)
+            end
+          end
+          xml.conversationCredentials("xsi:type" => "login:SessionCredentials") do
+            xml.sessionToken(you.session_token)
+          end
+          xml.valid(true)
+          xml.isPasswordExpired(false)
         end
+        
+        xml.contentServiceId(content_service_id)
+        xml.credentialFields do
+          Halberd::Utils.new.tag_xml(xml, 'elements', user_credentials)
+        end 
+        
+        xml.shareCredentialsWithinSite(true)
+        xml.startRefreshItemOnAddition(refresh)
+        @register_response = item_client.call :add_item_for_content_service1, message: xml
 
         item_registered!
         register_response.to_hash[:add_item_for_content_service1_response][:add_item_for_content_service1_return]
