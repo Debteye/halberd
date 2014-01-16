@@ -172,6 +172,15 @@ module Halberd
       end
     end
 
+    def extended_instant_verification_client
+      @extended_instant_verification_client ||= Savon::Client.new do
+        wsdl.namespace = "http://extendedinstantverificationdataservice.verification.core.soap.yodlee.com"
+        wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/ExtendedInstantVerificationDataService"
+        http.auth.ssl.verify_mode = :none
+        http.auth.ssl.ssl_version = :TLSv1
+      end
+    end
+
     def routing_number_client
       url = "#{yodlee_location}/yodsoap/services/RoutingNumberService"
       Savon.client(client_opts) do
@@ -621,6 +630,161 @@ module Halberd
           }
         }
         @detailed_summary_response = dataservice_client.call :get_item_summary_for_item, message: body
+      end
+
+      def update_item_credentials_and_start_verification_data!(item_id, opts = {})
+        user_credentials = opts[:credentials]
+                   
+        user_credentials && user_credentials.map! do |credential|
+          CREDENTIAL_ORDER.inject({}) do |hsh, key|
+            hsh[CREDENTIAL_CONVERT[key] || key] = credential[key]
+            hsh
+          end
+        end
+
+        update_response = extended_instant_verification_client.request :sl, :update_item_credentials_and_start_verification_data_request do
+          soap.element_form_default = :unqualified
+          soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
+          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
+          soap.namespaces['xmlns:common'] = 'http://common.soap.yodlee.com'
+          soap.body = {
+            :user_context => {
+              :cobrand_id      => credentials.cobrand_id,
+              :channel_id      => us.channel_id,
+              :locale          => credentials.locale,
+              :tnc_version     => credentials.tnc_version,
+              :application_id  => credentials.application_id,
+              :cobrand_conversation_credentials => {
+                :session_token => us.session_token,
+              },
+              :preference_info => prefs,
+              :fetch_all_locale_data => false,
+              :conversation_credentials => {
+                :session_token => you.session_token 
+              },
+              :valid => true,
+              :is_password_expired => false,
+              :attributes! => {
+                :locale => { "xsi:type" => "collections:Locale" },
+                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
+                :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
+              }
+            },
+            :item_id => item_id,            
+            :credential_fields => {
+              :elements => user_credentials,
+              :attributes! => {
+                :elements => { "xsi:type" => "common:FieldInfoSingle" },
+              }
+            },                    
+            :order! => [:user_context, :item_id, :credential_fields],
+            :attributes! => {
+              :user_context => { "xsi:type" => "common:UserContext" },
+            }
+          }
+        end
+
+        update_response.to_hash[:update_item_credentials_and_start_verification_data_request_response][:update_item_credentials_and_start_verification_data_request_return]
+      end
+
+      def get_instant_account_verification_item!(item_id, opts = {})
+        iav_items = [item_id]
+
+        return_items = instant_verification_client.request :sl, :get_item_verification_data do
+          soap.element_form_default = :unqualified
+          soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
+          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
+          soap.namespaces['xmlns:common'] = 'http://common.soap.yodlee.com'
+          soap.body = {
+            :user_context => {
+              :cobrand_id      => credentials.cobrand_id,
+              :channel_id      => us.channel_id,
+              :locale          => credentials.locale,
+              :tnc_version     => credentials.tnc_version,
+              :application_id  => credentials.application_id,
+              :cobrand_conversation_credentials => {
+                :session_token => us.session_token,
+              },
+              :preference_info => prefs,
+              :fetch_all_locale_data => false,
+              :conversation_credentials => {
+                :session_token => you.session_token 
+              },
+              :valid => true,
+              :is_password_expired => false,
+              :attributes! => {
+                :locale => { "xsi:type" => "collections:Locale" },
+                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
+                :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
+              }
+            },
+            :item_ids => {
+              :elements => iav_items 
+            },      
+            :order! => [:user_context, :item_ids],
+            :attributes! => {
+              :user_context => { "xsi:type" => "common:UserContext"}
+            }
+          }
+        end
+        
+        return_items.to_hash[:get_item_verification_data_response][:get_item_verification_data_return][:elements]
+      end
+
+      def register_instant_account_verification!(content_service_id, routing_number, opts = {})
+        user_credentials = opts[:credentials]
+                   
+        user_credentials && user_credentials.map! do |credential|
+          CREDENTIAL_ORDER.inject({}) do |hsh, key|
+            hsh[CREDENTIAL_CONVERT[key] || key] = credential[key]
+            hsh
+          end
+        end
+
+        @register_response = extended_instant_verification_client.request :sl, :add_item_and_start_verification_data_request do
+          soap.element_form_default = :unqualified
+          soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
+          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
+          soap.namespaces['xmlns:common'] = 'http://common.soap.yodlee.com'
+          soap.body = {
+            :user_context => {
+              :cobrand_id      => credentials.cobrand_id,
+              :channel_id      => us.channel_id,
+              :locale          => credentials.locale,
+              :tnc_version     => credentials.tnc_version,
+              :application_id  => credentials.application_id,
+              :cobrand_conversation_credentials => {
+                :session_token => us.session_token,
+              },
+              :preference_info => prefs,
+              :fetch_all_locale_data => false,
+              :conversation_credentials => {
+                :session_token => you.session_token 
+              },
+              :valid => true,
+              :is_password_expired => false,
+              :attributes! => {
+                :locale => { "xsi:type" => "collections:Locale" },
+                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
+                :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
+              }
+            },
+            :content_service_id => content_service_id,            
+            :credential_fields => {
+              :elements => user_credentials,
+              :attributes! => {
+                :elements => { "xsi:type" => "common:FieldInfoSingle" },
+              }
+            },
+            :routing_number => routing_number,            
+            :order! => [:user_context, :content_service_id, :credential_fields, :routing_number],
+            :attributes! => {
+              :user_context => { "xsi:type" => "common:UserContext" },
+            }
+          }
+        end
+        
+        register_response.to_hash[:add_item_and_start_verification_data_request_response][:add_item_and_start_verification_data_request_return]
       end
 
       def get_detailed_summary!
@@ -1144,6 +1308,7 @@ module Halberd
         @items << register_response.to_hash[:add_item_and_start_verification_data_request1_response][:add_item_and_start_verification_data_request1_return]
         register_response.to_hash[:add_item_and_start_verification_data_request1_response][:add_item_and_start_verification_data_request1_return]
       end
+
 
       def update_credentials(item_id, opts = {})
         user_credentials = opts[:credentials]
