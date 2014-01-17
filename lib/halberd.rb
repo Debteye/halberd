@@ -172,12 +172,15 @@ module Halberd
       end
     end
 
-    def extended_instant_verification_client
-      @extended_instant_verification_client ||= Savon::Client.new do
-        wsdl.namespace = "http://extendedinstantverificationdataservice.verification.core.soap.yodlee.com"
-        wsdl.endpoint  = "#{yodlee_location}/yodsoap/services/ExtendedInstantVerificationDataService"
-        http.auth.ssl.verify_mode = :none
-        http.auth.ssl.ssl_version = :TLSv1
+    def extended_instant_verification_client 
+      url = "#{yodlee_location}/yodsoap/services/ExtendedInstantVerificationDataService"
+      @extended_instant_verification_client ||= Savon::Client.new(client_opts) do
+        namespace "http://extendedinstantverificationdataservice.verification.core.soap.yodlee.com"
+        endpoint url
+        namespaces('xmlns:tns1' => "http://collections.soap.yodlee.com",
+                   'xmlns:login' => 'http://login.ext.soap.yodlee.com',
+                   'xmlns:common' => 'http://common.soap.yodlee.com')
+
       end
     end
 
@@ -642,47 +645,43 @@ module Halberd
           end
         end
 
-        update_response = extended_instant_verification_client.request :sl, :update_item_credentials_and_start_verification_data_request do
-          soap.element_form_default = :unqualified
-          soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
-          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
-          soap.namespaces['xmlns:common'] = 'http://common.soap.yodlee.com'
-          soap.body = {
-            :user_context => {
-              :cobrand_id      => credentials.cobrand_id,
-              :channel_id      => us.channel_id,
-              :locale          => credentials.locale,
-              :tnc_version     => credentials.tnc_version,
-              :application_id  => credentials.application_id,
-              :cobrand_conversation_credentials => {
-                :session_token => us.session_token,
-              },
-              :preference_info => prefs,
-              :fetch_all_locale_data => false,
-              :conversation_credentials => {
-                :session_token => you.session_token 
-              },
-              :valid => true,
-              :is_password_expired => false,
-              :attributes! => {
-                :locale => { "xsi:type" => "collections:Locale" },
-                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
-                :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
-              }
+#          soap.element_form_default = :unqualified
+        body = {
+          :user_context => {
+            :cobrand_id      => credentials.cobrand_id,
+            :channel_id      => us.channel_id,
+            :locale          => credentials.locale,
+            :tnc_version     => credentials.tnc_version,
+            :application_id  => credentials.application_id,
+            :cobrand_conversation_credentials => {
+              :session_token => us.session_token,
             },
-            :item_id => item_id,            
-            :credential_fields => {
-              :elements => user_credentials,
-              :attributes! => {
-                :elements => { "xsi:type" => "common:FieldInfoSingle" },
-              }
-            },                    
-            :order! => [:user_context, :item_id, :credential_fields],
+            :preference_info => prefs,
+            :fetch_all_locale_data => false,
+            :conversation_credentials => {
+              :session_token => you.session_token 
+            },
+            :valid => true,
+            :is_password_expired => false,
             :attributes! => {
-              :user_context => { "xsi:type" => "common:UserContext" },
+              :locale => { "xsi:type" => "collections:Locale" },
+              :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
+              :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
             }
+          },
+          :item_id => item_id,            
+          :credential_fields => {
+            :elements => user_credentials,
+            :attributes! => {
+              :elements => { "xsi:type" => "common:FieldInfoSingle" },
+            }
+          },                    
+          :order! => [:user_context, :item_id, :credential_fields],
+          :attributes! => {
+            :user_context => { "xsi:type" => "common:UserContext" },
           }
-        end
+        }
+        update_response = extended_instant_verification_client.call :update_item_credentials_and_start_verification_data_request, message: body
 
         update_response.to_hash[:update_item_credentials_and_start_verification_data_request_response][:update_item_credentials_and_start_verification_data_request_return]
       end
@@ -741,48 +740,44 @@ module Halberd
           end
         end
 
-        @register_response = extended_instant_verification_client.request :sl, :add_item_and_start_verification_data_request do
-          soap.element_form_default = :unqualified
-          soap.namespaces['xmlns:tns1'] = "http://collections.soap.yodlee.com"
-          soap.namespaces['xmlns:login'] = 'http://login.ext.soap.yodlee.com'
-          soap.namespaces['xmlns:common'] = 'http://common.soap.yodlee.com'
-          soap.body = {
-            :user_context => {
-              :cobrand_id      => credentials.cobrand_id,
-              :channel_id      => us.channel_id,
-              :locale          => credentials.locale,
-              :tnc_version     => credentials.tnc_version,
-              :application_id  => credentials.application_id,
-              :cobrand_conversation_credentials => {
-                :session_token => us.session_token,
-              },
-              :preference_info => prefs,
-              :fetch_all_locale_data => false,
-              :conversation_credentials => {
-                :session_token => you.session_token 
-              },
-              :valid => true,
-              :is_password_expired => false,
-              :attributes! => {
-                :locale => { "xsi:type" => "collections:Locale" },
-                :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
-                :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
-              }
+        #  soap.element_form_default = :unqualified
+        body = {
+          :user_context => {
+            :cobrand_id      => credentials.cobrand_id,
+            :channel_id      => us.channel_id,
+            :locale          => credentials.locale,
+            :tnc_version     => credentials.tnc_version,
+            :application_id  => credentials.application_id,
+            :cobrand_conversation_credentials => {
+              :session_token => us.session_token,
             },
-            :content_service_id => content_service_id,            
-            :credential_fields => {
-              :elements => user_credentials,
-              :attributes! => {
-                :elements => { "xsi:type" => "common:FieldInfoSingle" },
-              }
+            :preference_info => prefs,
+            :fetch_all_locale_data => false,
+            :conversation_credentials => {
+              :session_token => you.session_token 
             },
-            :routing_number => routing_number,            
-            :order! => [:user_context, :content_service_id, :credential_fields, :routing_number],
+            :valid => true,
+            :is_password_expired => false,
             :attributes! => {
-              :user_context => { "xsi:type" => "common:UserContext" },
+              :locale => { "xsi:type" => "collections:Locale" },
+              :cobrand_conversation_credentials => { "xsi:type" => "login:SessionCredentials" },
+              :conversation_credentials => { "xsi:type" => "login:SessionCredentials" }
             }
+          },
+          :content_service_id => content_service_id,            
+          :credential_fields => {
+            :elements => user_credentials,
+            :attributes! => {
+              :elements => { "xsi:type" => "common:FieldInfoSingle" },
+            }
+          },
+          :routing_number => routing_number,            
+          :order! => [:user_context, :content_service_id, :credential_fields, :routing_number],
+          :attributes! => {
+            :user_context => { "xsi:type" => "common:UserContext" },
           }
-        end
+        }
+        @register_response = extended_instant_verification_client.call :add_item_and_start_verification_data_request, message: body
         
         register_response.to_hash[:add_item_and_start_verification_data_request_response][:add_item_and_start_verification_data_request_return]
       end
